@@ -1,0 +1,12 @@
+{
+  "short_name": "PracticumMessenger",
+  "name": "PracticumMessenger",
+  "icons": [{
+    "src": "img/favicon96.png",
+    "type": "image/png",
+    "sizes": "96x96"
+  }],
+  "start_url": "/index.html",
+  "background_color": "#C4C4C4",
+  "theme_color": "#DCFF7D"
+}

@@ -1,0 +1,5 @@
+<section class="message_body">
+    <div class="text">{{$text}}</div>
+    <div class="timestamp">{{$time}}</div>
+    <div class="unread status-{{$status}}"></div>
+</section>

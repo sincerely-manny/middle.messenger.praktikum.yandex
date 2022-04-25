@@ -1,0 +1,6 @@
+<section class="message_body message_img">
+    <img src="{{$img_attachment}}" alt="">
+    <div class="text">{{$text}}</div>
+    <div class="timestamp">{{$time}}</div>
+    <div class="unread status-{{$status}}"></div>
+</section>

@@ -1,0 +1,3 @@
+<section class="date_separator">
+    {{$date}}
+</section>

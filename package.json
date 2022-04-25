@@ -1,0 +1,34 @@
+{
+  "name": "practicum_messenger",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "scripts": {
+    "dev": "parcel static/index.html -p 3000",
+    "build": "parcel build static/index.html",
+    "start": "npm run build && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@parcel/packager-raw-url": "^2.5.0",
+    "@parcel/resolver-glob": "^2.5.0",
+    "@parcel/transformer-inline-string": "^2.5.0",
+    "@parcel/transformer-less": "^2.5.0",
+    "@parcel/transformer-webmanifest": "^2.5.0",
+    "@sincerely-manny/parcel-transformer-tbt": "github:sincerely-manny/parcel-transformer-tbt",
+    "less": "^4.1.2",
+    "parcel": "^2.5.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10"
+  },
+  "engines": {
+    "node": "^16.14.2"
+  },
+  "browserslist": [
+    "last 1 chrome version",
+    "last 1 firefox version",
+    "last 1 safari version"
+  ]
+}

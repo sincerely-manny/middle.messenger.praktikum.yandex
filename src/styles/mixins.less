@@ -1,0 +1,95 @@
+.sans {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.serif {
+    font-family: 'Lora', serif;
+}
+
+.image_as_bg(@image) {
+    background-image: url('@{images}/@{image}');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+}
+
+.text_input {
+    border-radius: 0px;
+    border: 0px solid @black;
+    outline: 1px solid @black;
+    margin: 0;
+    padding: 0;
+    font-weight: 300;
+    color: @black;
+    background-color: @grey;
+    box-sizing: border-box;
+    transition: outline 0.3s;
+    vertical-align: middle;
+    &:focus {
+        outline: 1px solid @green;
+        opacity: 100%;
+    }
+    &::placeholder {
+        color: @black;
+        opacity: 50%;
+    }
+}
+
+.submit_button() {
+    display: inline-block;
+    text-indent: -100px;
+    overflow: hidden;
+    background: transparent;
+    border: 0px;
+    outline: 0px;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    cursor: pointer;
+    svg {
+        display: block;
+    }
+}
+
+.round_submit() {
+    display: inline-block;
+    background-color: @green;
+    border: 0px;
+    outline: 0px;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;
+    text-align: center;
+    line-height: 2.2em;
+    border-radius: 1.1em;
+    width: 2.2em;
+    height: 2.2em;
+    .serif();
+    font-size: @biggest;
+    cursor: pointer;
+    color: @black;
+}
+
+.form_table() {
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    font-weight: 300;
+    border-bottom: 1px solid @black;
+    line-height: 1.5em;
+    width: 270px;
+    transition: border-bottom 0.3s;
+    &:focus {
+        border-bottom: 1px solid @green;
+    }
+    margin: 0;
+    display: block;
+}
+.small_submit() {
+    border: 0;
+    outline: 0;
+    background: @green;
+    font-weight: 300;
+    padding: 0.5em;
+    cursor: pointer;
+}

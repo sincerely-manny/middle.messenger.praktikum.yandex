@@ -1,0 +1,8 @@
+<article class="error">
+    <div class="cont">
+      <h1>{{$error.num}}</h1>
+      <h5>{{$error.text}}</h5>
+      <p>{{$error.comment}}</p>
+      <h5><a href="/">Go back to chats</a></h5>
+    </div>
+  </article>
