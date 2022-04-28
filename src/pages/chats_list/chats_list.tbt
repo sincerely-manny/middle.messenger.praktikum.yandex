@@ -14,7 +14,7 @@
             <p class="last_message_preview">{{$last_message.preview}}</p>
         </div>
         <div class="info">
-            <div class="last_message_time">{{$last_message.time}}</div>
+            <time class="last_message_time">{{$last_message.time}}</time>
             <div class="unread_count" data-unread="{{$last_message.unread}}">{{$last_message.unread}}</div>
         </div>
     </section>

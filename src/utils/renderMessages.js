@@ -6,11 +6,13 @@ export async function renderMessages(data) {
     let currShownDate = null;
 
     for(let message of data.active_chat.messages) {
-        MsgTE = new TemplateBike(message);
         let mDate = new Date(message.timestamp*1000);
-        message.date = mDate.toLocaleDateString();
-        message.time = mDate.toLocaleTimeString('ru-RU').slice(0,-3);
         let newDate = false;
+        const messageToRender = Object.assign({}, message, {
+            date: mDate.toLocaleDateString(),
+            time: mDate.toLocaleTimeString('ru-RU').slice(0,-3),
+        });
+        MsgTE = new TemplateBike(messageToRender);
         if(currShownDate !==  message.date) {
             currShownDate = message.date;
             newDate = true;

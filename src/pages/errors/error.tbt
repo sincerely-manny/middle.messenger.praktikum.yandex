@@ -3,6 +3,7 @@
       <h1>{{$error.num}}</h1>
       <h5>{{$error.text}}</h5>
       <p>{{$error.comment}}</p>
-      <h5><a href="/">Go back to chats</a></h5>
+      <a href="/" class="goback">Go back to chats</a>
     </div>
   </article>
+  
