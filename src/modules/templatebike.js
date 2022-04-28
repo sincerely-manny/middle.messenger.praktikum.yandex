@@ -13,6 +13,8 @@
  * TE.render(templateName, targetElem); 
  */
 
+ const TEXT_NODE = 3;
+ const ELEMENT_NODE = 1;
 export class TemplateBike {
     constructor(data = {}, pathToTemplates = '/src/pages') {
         this.pages = import('../../src/pages/*/*.tbt');
@@ -24,16 +26,15 @@ export class TemplateBike {
             each: function(marker) {return new RegExp(`\{\{\\$${marker}\}\}([^]*)\{\{/\\$${marker}\}\}`, 'gi')},
         }
         this.renderedCollection = document.createElement('div');
-
     }
     
     renderNode(node, dataset = false) {
         if(node.hasChildNodes()) {      
             node.childNodes.forEach(child => {
-                if(child.nodeType === 3) {  //если текстовая нода – парсим текст
+                if(child.nodeType === TEXT_NODE) {  //если текстовая нода – парсим текст
                     child.textContent = this.renderExpressionString(child.textContent, child, dataset);
                 }
-                else if(child.nodeType === 1) { //если элемент - идем глубже
+                else if(child.nodeType === ELEMENT_NODE) { //если элемент - идем глубже
                     this.renderNode(child, dataset);
                     if(child.hasAttributes()) { //и парсим значения атрибутов
                         let attributes = child.attributes;
@@ -49,6 +50,7 @@ export class TemplateBike {
         }
         return node;
     }
+
     renderExpressionString(string, currentNode = document.body, dataset = false) {
         let hasTemplateExpression = this.regexp.temptateExpression.test(string);
         while(hasTemplateExpression) {
@@ -56,24 +58,11 @@ export class TemplateBike {
                 let renderedVariable = found.replace(this.regexp.variable, (match, foundVariableName, offset, variableString) => {
                     let varValue = this.getVariable(foundVariableName, dataset);
                     if (Array.isArray(varValue)) { //если возвращается массив - пробуем искать закрывающий тег
-                        if(this.regexp.each(foundVariableName).test(currentNode.parentElement.innerHTML)) {
-                            currentNode.parentElement.innerHTML = currentNode.parentElement.innerHTML.replace(
-                                this.regexp.each(foundVariableName), 
-                                (match, found, offset, variableString) => {
-                                    let eachNode = '';
-                                    varValue.forEach(elem => {
-                                        let node = document.createElement('div');
-                                        node.innerHTML = found;
-                                        eachNode += this.renderNode(node, elem).innerHTML;
-                                    });
-                                    return eachNode;
-                                });
-                        }
-                        else {
-                            return JSON.stringify(varValue); //есть массив, но нет закрывающего тега в родительской ноде
-                        }
+                        return this.renderArray(foundVariableName, varValue, currentNode);
                     }
-                    else return varValue ?? match; //нет, не массив
+                    else {
+                        return varValue ?? match; //нет, не массив
+                    }
                 });
                 return renderedVariable;
             });
@@ -81,6 +70,26 @@ export class TemplateBike {
         }
         return string;
     }
+
+    renderArray(foundVariableName, varValue, currentNode) {
+        if(this.regexp.each(foundVariableName).test(currentNode.parentElement.innerHTML)) {
+            currentNode.parentElement.innerHTML = currentNode.parentElement.innerHTML.replace(
+                this.regexp.each(foundVariableName), 
+                (match, found, offset, variableString) => {
+                    let eachNode = '';
+                    varValue.forEach(elem => {
+                        let node = document.createElement('div');
+                        node.innerHTML = found;
+                        eachNode += this.renderNode(node, elem).innerHTML;
+                    });
+                    return eachNode;
+                });
+        }
+        else {
+            return JSON.stringify(varValue); //есть массив, но нет закрывающего тега в родительской ноде
+        }
+    }
+
     getVariable(variableName, dataset = false, defaultValue = null) {
         let value;
         if(dataset == false) value =  this.data; //если не передан контекст поиска (или передан пустой)
@@ -126,6 +135,7 @@ export class TemplateBike {
         }
         return targetElem;
     }
+
     prependTo(targetElem) {
         if(targetElem !== null) {
             while(this.renderedCollection.childNodes.length > 0) {
