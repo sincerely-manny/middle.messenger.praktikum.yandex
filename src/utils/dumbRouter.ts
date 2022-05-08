@@ -1,11 +1,18 @@
 import { renderModalForm } from './renderModalForm';
 import { renderMessages } from './renderMessages';
+import { TemplateBike } from '../modules/templatebike';
 
-export function dumbRouter(TE) {
+export function dumbRouter(TE: TemplateBike) {
     let hash = location.hash.substring(1);
-    document.getElementById('container').innerHTML = '<div id="chats_list"></div><div id="active_chat"></div>';
+    let container = document.getElementById('container');
+    if(container === null) {
+        container = document.createElement('main'); 
+        container.id= 'container';
+        document.body.append(container);
+    }
+    container.innerHTML = '<div id="chats_list"></div><div id="active_chat"></div>';
     let modalWindows = document.getElementsByClassName('modal_window');
-    for(mw of modalWindows) {
+    for(let mw of modalWindows) {
         mw.remove();
     }
 
@@ -70,7 +77,7 @@ export function dumbRouter(TE) {
                 text: 'Page could not be found',
                 comment: 'Do you really need it anyway?',
             }
-            document.getElementById('container').innerHTML = ' ';
+            container.innerHTML = ' ';
             TE.render('errors/error', document.getElementById('container'));
             break;
         case '500':
@@ -79,7 +86,7 @@ export function dumbRouter(TE) {
                 text: 'That’s an error',
                 comment: 'But we don’t blame it on you',
             }
-            document.getElementById('container').innerHTML = ' ';
+            container.innerHTML = ' ';
             TE.render('errors/error', document.getElementById('container'));
             break;
     }

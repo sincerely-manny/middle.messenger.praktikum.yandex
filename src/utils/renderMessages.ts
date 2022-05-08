@@ -1,7 +1,7 @@
 import { TemplateBike } from "../modules/templatebike";
 
-export async function renderMessages(data) {
-    let MsgTE = {};
+export async function renderMessages(data: TemplateBike['data']) {
+    //let MsgTE: typeof TemplateBike;
     let sender = null;
     let currShownDate = null;
 
@@ -12,7 +12,7 @@ export async function renderMessages(data) {
             date: mDate.toLocaleDateString(),
             time: mDate.toLocaleTimeString('ru-RU').slice(0,-3),
         });
-        MsgTE = new TemplateBike(messageToRender);
+        let MsgTE = new TemplateBike(messageToRender);
         if(currShownDate !==  message.date) {
             currShownDate = message.date;
             newDate = true;
@@ -30,5 +30,5 @@ export async function renderMessages(data) {
         }
     }
     let chatCont = document.getElementById('active_chat_messages_container');
-    chatCont.scrollTo(0, chatCont.scrollHeight);
+    chatCont != null ? chatCont.scrollTo(0, chatCont.scrollHeight) : false;
 };
