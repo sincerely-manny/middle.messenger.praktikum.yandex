@@ -13,11 +13,17 @@
  * TE.render(templateName, targetElem); 
  */
 
- const TEXT_NODE = 3;
- const ELEMENT_NODE = 1;
+const TEXT_NODE = 3;
+const ELEMENT_NODE = 1;
+
 export class TemplateBike {
+    protected readonly regexp: { temptateExpression: RegExp; variable: RegExp; each: (marker: any) => RegExp; };
+    protected readonly pathToTemplates: string;
+    protected templates: Promise<object>;
+    protected renderedCollection: Element;
+    public data: { [key: string]: any };
     constructor(data = {}, pathToTemplates = '/src/pages') {
-        this.pages = import('../../src/pages/*/*.tbt');
+        this.templates = import('../../src/pages/*/*.tbt'); // typescript ругается, но как по-другому запихать в parcel пачку шаблонов? 🤷‍♂️
         this.data = data;
         this.pathToTemplates = pathToTemplates;
         this.regexp = {
@@ -28,34 +34,36 @@ export class TemplateBike {
         this.renderedCollection = document.createElement('div');
     }
     
-    renderNode(node, dataset = false) {
+    private renderNode(node: Element, dataset: Array<object> | boolean = false): Element{
         if(node.hasChildNodes()) {      
-            node.childNodes.forEach(child => {
+            for(let child of node.childNodes) {
+                let childElement = <Element> child;
                 if(child.nodeType === TEXT_NODE) {  //если текстовая нода – парсим текст
-                    child.textContent = this.renderExpressionString(child.textContent, child, dataset);
+                    child.textContent = this.renderExpressionString(child.textContent, childElement, dataset);
                 }
                 else if(child.nodeType === ELEMENT_NODE) { //если элемент - идем глубже
-                    this.renderNode(child, dataset);
-                    if(child.hasAttributes()) { //и парсим значения атрибутов
-                        let attributes = child.attributes;
+                    this.renderNode(childElement, dataset);
+                    if(childElement.hasAttributes()) { //и парсим значения атрибутов
+                        let attributes = childElement.attributes;
                         for (var i = 0; i < attributes.length; i++) {
-                            child.setAttribute(
+                            childElement.setAttribute(
                                 attributes[i].name, 
-                                this.renderExpressionString(attributes[i].value, child, dataset)
+                                this.renderExpressionString(attributes[i].value, childElement, dataset)
                             );
                         }
                     }
                 }
-            });
+            };
         }
         return node;
     }
 
-    renderExpressionString(string, currentNode = document.body, dataset = false) {
+    private renderExpressionString(string: string | null, currentNode:Element = document.body, dataset: Array<object> | boolean = false): string {
+        if(string === null) return '';
         let hasTemplateExpression = this.regexp.temptateExpression.test(string);
         while(hasTemplateExpression) {
-            string = string.replace(this.regexp.temptateExpression, (match, found, offset, expressionString) => {
-                let renderedVariable = found.replace(this.regexp.variable, (match, foundVariableName, offset, variableString) => {
+            string = string.replace(this.regexp.temptateExpression, (match, found) => {
+                let renderedVariable: string = found.replace(this.regexp.variable, (match: string, foundVariableName: string) => {
                     let varValue = this.getVariable(foundVariableName, dataset);
                     if (Array.isArray(varValue)) { //если возвращается массив - пробуем искать закрывающий тег
                         return this.renderArray(foundVariableName, varValue, currentNode);
@@ -71,13 +79,13 @@ export class TemplateBike {
         return string;
     }
 
-    renderArray(foundVariableName, varValue, currentNode) {
-        if(this.regexp.each(foundVariableName).test(currentNode.parentElement.innerHTML)) {
+    private renderArray(foundVariableName: string, varValue: Array<object>, currentNode: Element) {
+        if(currentNode.parentElement !== null && this.regexp.each(foundVariableName).test(currentNode.parentElement.innerHTML)) {
             currentNode.parentElement.innerHTML = currentNode.parentElement.innerHTML.replace(
                 this.regexp.each(foundVariableName), 
-                (match, found, offset, variableString) => {
+                (match, found) => {
                     let eachNode = '';
-                    varValue.forEach(elem => {
+                    varValue.forEach((elem: Array<object>) => {
                         let node = document.createElement('div');
                         node.innerHTML = found;
                         eachNode += this.renderNode(node, elem).innerHTML;
@@ -90,15 +98,15 @@ export class TemplateBike {
         }
     }
 
-    getVariable(variableName, dataset = false, defaultValue = null) {
-        let value;
-        if(dataset == false) value =  this.data; //если не передан контекст поиска (или передан пустой)
+    private getVariable(variableName: string, dataset: Object = {}, defaultValue: string = ''): string | Array<object> {
+        let value: any;
+        if(Object.keys(dataset).length === 0) value =  this.data; //если не передан контекст поиска (или передан пустой)
         else value = dataset; //контекст передан
         let path = variableName.split('.');
         for(let key of path) {
             value = value[key];
             if(value === undefined) {
-                if(dataset) return this.getVariable(variableName); //переменная не найдена в контексте - ищем во всем объекте
+                if(Object.keys(dataset).length !== 0) return this.getVariable(variableName); //переменная не найдена в контексте - ищем во всем объекте
                 return defaultValue;
             }
         }
@@ -106,9 +114,9 @@ export class TemplateBike {
         return value.toString() ?? defaultValue;
     }
 
-    async fetchTemplate(templateName) {
+    private async fetchTemplate(templateName: string) {
         let templatePath = templateName.split('/');
-        let template = await this.pages;
+        let template: any = await this.templates;
         for(let i = 0; i < templatePath.length; i++) {
             template = await template[templatePath[i]];
         }
@@ -116,18 +124,18 @@ export class TemplateBike {
         return template.default;
     }
     
-    async render(templateName, targetElem = undefined) {
+    public async render(templateName: string, targetElem: Element | null = null) {
         let template = await this.fetchTemplate(templateName);
         let element = document.createElement('div');
         element.innerHTML = template;
-        this.renderedCollection = this.renderNode(element);
-        if(targetElem != undefined) {
+        this.renderedCollection = <Element> this.renderNode(element);
+        if(targetElem != null) {
             this.appendTo(targetElem);
         }
         return this.renderedCollection;
     }
     
-    appendTo(targetElem) {
+    public appendTo(targetElem: Element): Element {
         if(targetElem !== null) {
             while(this.renderedCollection.childNodes.length > 0) {
                 targetElem.append(this.renderedCollection.childNodes[0]);
@@ -136,7 +144,7 @@ export class TemplateBike {
         return targetElem;
     }
 
-    prependTo(targetElem) {
+    public prependTo(targetElem: Element): Element {
         if(targetElem !== null) {
             while(this.renderedCollection.childNodes.length > 0) {
                 targetElem.prepend(this.renderedCollection.childNodes[this.renderedCollection.childNodes.length - 1]);

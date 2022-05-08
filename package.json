@@ -18,10 +18,12 @@
     "@parcel/transformer-less": "2.5.0",
     "@parcel/transformer-webmanifest": "2.5.0",
     "@sincerely-manny/parcel-transformer-tbt": "github:sincerely-manny/parcel-transformer-tbt",
+    "eslint": "^8.14.0",
     "less": "~4.1.2",
     "parcel": "2.5.0",
     "path-browserify": "1.0.1",
-    "process": "0.11.10"
+    "process": "0.11.10",
+    "typescript": "^4.6.4"
   },
   "engines": {
     "node": "16.14.2"

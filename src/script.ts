@@ -1,5 +1,4 @@
 import { TemplateBike } from "./modules/templatebike";
-import { renderMessages } from './utils/renderMessages';
 import { dumbRouter } from './utils/dumbRouter';
 import { data } from './utils/testData';
 
