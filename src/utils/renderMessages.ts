@@ -17,19 +17,19 @@ export async function renderMessages(data: TemplateBike['data']) {
         if (currShownDate !== message.date) {
             currShownDate = message.date;
             newDate = true;
-            await MsgTE.render('messages/date', document.getElementById('active_chat_messages'));
+            await MsgTE.render('messages/date', document.getElementById('active-chat-messages'));
         }
         if (sender !== message.sender.id || newDate) {
             sender = message.sender.id;
-            await MsgTE.render('messages/sender', document.getElementById('active_chat_messages'));
+            await MsgTE.render('messages/sender', document.getElementById('active-chat-messages'));
         }
         if (message.img_attachment !== undefined) {
-            await MsgTE.render('messages/message_img', document.getElementById('active_chat_messages'));
+            await MsgTE.render('messages/message_img', document.getElementById('active-chat-messages'));
         } else {
-            await MsgTE.render('messages/message', document.getElementById('active_chat_messages'));
+            await MsgTE.render('messages/message', document.getElementById('active-chat-messages'));
         }
     }
-    const chatCont = document.getElementById('active_chat_messages_container');
+    const chatCont = document.getElementById('active-chat-messages_container');
     if (chatCont != null) {
         chatCont.scrollTo(0, chatCont.scrollHeight);
     }

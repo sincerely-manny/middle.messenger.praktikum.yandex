@@ -10,8 +10,8 @@ export function dumbRouter(TE: TemplateBike) {
         container.id = 'container';
         document.body.append(container);
     }
-    container.innerHTML = '<div id="chats_list"></div><div id="active_chat"></div>';
-    const modalWindows = document.getElementsByClassName('modal_window');
+    container.innerHTML = '<div id="chats-list"></div><div id="active-chat"></div>';
+    const modalWindows = document.getElementsByClassName('modal-window');
     Array.from(modalWindows).forEach((mw) => {
         mw.remove();
     });
@@ -72,19 +72,19 @@ export function dumbRouter(TE: TemplateBike) {
             renderModalForm(TE);
             break;
         case 'nochat':
-            TE.render('chats_list/chats_list', document.getElementById('chats_list'));
-            TE.render('chat/no_active_chat', document.getElementById('active_chat'));
+            TE.render('chats_list/chats_list', document.getElementById('chats-list'));
+            TE.render('chat/no_active_chat', document.getElementById('active-chat'));
             break;
         case 'chat':
-            TE.render('chats_list/chats_list', document.getElementById('chats_list'));
-            TE.render('chat/active_chat', document.getElementById('active_chat')).then(() => {
+            TE.render('chats_list/chats_list', document.getElementById('chats-list'));
+            TE.render('chat/active_chat', document.getElementById('active-chat')).then(() => {
                 renderMessages(TE.data);
-                TE.render('chat/new_message_form', document.getElementById('active_chat_new_message'));
+                TE.render('chat/new_message_form', document.getElementById('active-chat-new-message'));
             });
             break;
         case 'profile':
-            TE.render('chats_list/chats_list', document.getElementById('chats_list'));
-            TE.render('profile/profile', document.getElementById('active_chat'));
+            TE.render('chats_list/chats_list', document.getElementById('chats-list'));
+            TE.render('profile/profile', document.getElementById('active-chat'));
             break;
         case '404':
             TE.setData('error', {

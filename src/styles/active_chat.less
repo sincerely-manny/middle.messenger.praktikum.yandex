@@ -1,0 +1,206 @@
+#active-chat {
+    width: 100%;
+    .flex-display();
+}
+
+.active-chat-container {
+    .flex-display();
+    .flex-direction(column);
+
+    .active-chat-messages-container {
+        padding: 0 3em;
+        box-sizing: border-box;
+        overflow-y: scroll;
+    }
+}
+
+.date-separator {
+    display: block;
+    border-top: 1px solid @green;
+    border-bottom: 1px solid @green;
+    .serif();
+
+    font-size: 1.3em;
+    line-height: 2.15em;
+    text-align: center;
+    margin: 1.3em auto;
+}
+
+#active-chat-messages {
+    margin-bottom: 2.2em;
+
+    .sender {
+        margin: 1.5em 0 0.5em;
+
+        *> {
+            vertical-align: middle;
+        }
+
+        .avatar {
+            object-fit: cover;
+            object-position: 50% 50%;
+            width: 2.15em;
+            height: 2.15em;
+            margin-right: 0.5em;
+        }
+
+        .name {
+            line-height: 2.15em;
+            font-weight: 600;
+        }
+    }
+
+    .message-body {
+        position: relative;
+
+        .text {
+            .serif();
+
+            text-align: justify;
+            font-size: @bigger;
+            padding: 0 3em 0 0;
+            box-sizing: border-box;
+            margin: 0.5em 0;
+
+            &::before {
+                content: '—';
+                display: inline-block;
+                width: 1.1em;
+                margin-left: -1.1em;
+            }
+        }
+
+        .timestamp {
+            position: absolute;
+            top: 0;
+            right: 0;
+            line-height: 1.7em;
+            font-size: @smaller;
+            font-weight: 300;
+            color: fade(@black, 50%);
+        }
+
+        .unread {
+            position: absolute;
+            top: (@smaller/2.15);
+            right: -1em;
+            width: (@smaller/1.5);
+            height: (@smaller/1.5);
+            border-radius: 1em;
+            opacity: 1;
+            transition: background-color 0.3s, opacity 0.2s;
+
+            &.status-sent {
+                background-color: fade(@black, 50%);
+            }
+
+            &.status-delivered {
+                background-color: @green;
+            }
+
+            &.status-unread {
+                background-color: @green;
+            }
+
+            &.status-read {
+                opacity: 0;
+            }
+        }
+    }
+
+    .message-img {
+        img {
+            margin: 1em 0 0;
+            height: 300px;
+            box-shadow: 3px 3px 7px fade(@black, 50%);
+        }
+
+        .text {
+            margin-top: 0;
+        }
+    }
+}
+
+#active-chat-new-message {
+    padding: 0 3em;
+    position: relative;
+    box-sizing: border-box;
+
+    &::before {
+        content: ' ';
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 1.5em;
+        top: -1.5em;
+        left: 0;
+        background: linear-gradient(0deg, @grey 20%, (fade(@grey, 0%)) 100%);
+    }
+}
+
+.new-message-form-container {
+    font-size: @bigger;
+    height: 4em;
+    padding-top: 2px;
+    box-sizing: border-box;
+
+    .input-container {
+        .flex-display();
+        .flex-direction(row);
+
+        .message-text-input-container {
+            white-space: nowrap;
+            .flex-grow(1);
+        }
+
+        .send-button {
+            .submit_button();
+
+            line-height: 2.5em;
+            height: 2.5em;
+            margin-left: -37px;
+
+            path {
+                fill: fade(@black, 50%);
+                stroke: transparent;
+                transition: fill 0.3s;
+            }
+        }
+
+        .buttons-container {
+            button {
+                .submit_button();
+
+                line-height: 2.5em;
+                height: 2.5em;
+                margin-left: 1.1em;
+
+                path {
+                    fill: fade(@black, 50%);
+                    stroke: transparent;
+                    transition: fill 0.3s;
+                }
+
+                &:hover {
+                    path {
+                        fill: @black;
+                    }
+                }
+            }
+        }
+    }
+
+    input.message-text {
+        .text-input();
+
+        line-height: 2.5em;
+        padding: 0 3em 0 1em;
+        width: 100%;
+
+        &:valid ~ .send-button {
+            path {
+                fill: @green;
+            }
+        }
+    }
+}
