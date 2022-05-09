@@ -2,8 +2,11 @@
 =======
 
 Запуск: % npm start
+
 Сборка: % npm run build
+
 Linting: % npm run lint
+
 
 Шаблон:
 https://www.figma.com/file/pkDI0nw7lW2OSNCXr8xpbj/Messenger?node-id=0%3A1
