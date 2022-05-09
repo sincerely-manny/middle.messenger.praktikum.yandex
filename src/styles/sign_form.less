@@ -1,0 +1,29 @@
+.sign-form {
+    font-size: @bigger;
+
+    input[type='text'],
+    input[type='password'] {
+        .text-input();
+
+        display: block;
+        line-height: @biggest;
+        margin: @biggest 0;
+        padding: 0 1em;
+        width: 100%;
+    }
+
+    input[type='submit'] {
+        .round_submit();
+
+        display: block;
+        float: right;
+        margin-bottom: -0.35em;
+
+        & ~ p {
+            display: block;
+            clear: both;
+            line-height: 1em;
+            margin: 0 0 @biggest 0;
+        }
+    }
+}
