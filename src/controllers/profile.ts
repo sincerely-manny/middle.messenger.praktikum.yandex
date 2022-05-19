@@ -60,7 +60,7 @@ const forms = {
                 label: {
                     value_before: 'Visible name:',
                 },
-                validate: 'name',
+                validate: 'displayname',
             },
             {
                 type: 'text',
