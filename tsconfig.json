@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "dist",
+        "lib": ["es2019", "DOM", "DOM.Iterable"],
         "target": "es2016",
         "noUnusedLocals": true,
         "noUnusedParameters": true,
