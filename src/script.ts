@@ -1,7 +1,3 @@
-import TemplateBike from './modules/templatebike';
-import { dumbRouter } from './utils/dumbRouter';
-import { data } from './utils/testData';
+import start from './controllers';
 
-const TE = new TemplateBike(data);
-dumbRouter(TE);
-window.addEventListener('hashchange', () => { dumbRouter(TE); });
+start();

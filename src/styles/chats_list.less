@@ -19,7 +19,7 @@
     .profile-link {
         width: 58px;
         height: 58px;
-        .image_as_bg('user_profile.png');
+        //.image_as_bg('user_profile.png');
 
         background-size: auto 58px;
         background-position: 0% 50%;
@@ -27,13 +27,23 @@
         text-align: center;
         vertical-align: middle;
 
+        svg {
+            fill: fade(@grey, 50%);
+            transition: fill 0.5s;
+        }
+
         &:hover {
-            background-position: 100% 50%;
+            svg {
+                fill: @grey;
+            }
         }
 
         &:active,
-        &:focus {
-            background-position: 50% 50%;
+        &:focus,
+        .active {
+            svg {
+                fill: @green;
+            }
         }
     }
 
@@ -113,6 +123,9 @@
 
         div.preview {
             .align-self(center);
+            .flex-shrink(0);
+            .flex-grow(2);
+            .flex-basis(225px);
         }
 
         p {
@@ -181,7 +194,7 @@
             }
         }
 
-        &[data-active='true'] {
+        &.active {
             background-color: fade(@green, 50%);
 
             .last-message-preview {

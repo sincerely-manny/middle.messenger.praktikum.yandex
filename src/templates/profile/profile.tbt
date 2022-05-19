@@ -1,0 +1,19 @@
+<article class="user-profile">
+    <a href="#chat" class="goback-button">
+        <svg width="28" height="49" viewBox="0 0 28 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M27.7162 5.19124L23.5125 0.987488L0 24.5L23.5125 48.0125L27.7162 43.8087L8.4075 24.5L27.7162 5.19124Z" fill="#DCFF7D"/>
+        </svg>
+    </a>
+    <h2>Your profile</h2>
+    <a href="#signin" class="logout-button">
+        log out
+        <svg width="31" height="27" viewBox="0 0 31 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22.7916 6.20833L20.7354 8.26458L24.4979 12.0417H9.66663V14.9583H24.4979L20.7354 18.7208L22.7916 20.7917L30.0833 13.5L22.7916 6.20833ZM3.83329 3.29167H15.5V0.375H3.83329C2.22913 0.375 0.916626 1.6875 0.916626 3.29167V23.7083C0.916626 25.3125 2.22913 26.625 3.83329 26.625H15.5V23.7083H3.83329V3.29167Z" fill="#DCFF7D"/>
+        </svg>
+            
+    </a>
+    {{$profile_form}}
+    <hr>
+    <h3>Change password:</h3>
+    {{$password_form}}
+</article>
