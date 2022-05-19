@@ -51,6 +51,11 @@ export abstract class Form {
     }
 
     public logObject() {
+        // да, уродливо, зато быстро
+        this.inputs?.forEach((i) => { // триггерим валидацию всех полей при сабмите
+            i.focus();
+            i.blur();
+        });
         const object: { [key: string]: FormDataEntryValue | null } = {};
         const formData = new FormData(this.form);
         // eslint-disable-next-line no-restricted-syntax
