@@ -1,11 +1,32 @@
 #active-chat {
     width: 100%;
+    position: relative;
     .flex-display();
+
+    &:empty {
+        .image_as_bg('chat.svg');
+
+        background-size: auto 75%;
+
+        &::after {
+            display: block;
+            position: absolute;
+            bottom: 0.5em;
+            width: 100%;
+            text-align: center;
+            font-size: 3.23em;
+            color: fade(@black, 50%);
+            margin: 0.5em 0 0;
+            content: 'Select a chat to start messaging';
+            .serif;
+        }
+    }
 }
 
 .active-chat-container {
     .flex-display();
     .flex-direction(column);
+    .justify-content(space-between);
 
     .active-chat-messages-container {
         padding: 0 3em;

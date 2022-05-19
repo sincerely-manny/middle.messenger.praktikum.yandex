@@ -1,6 +1,6 @@
 {
   "name": "practicum_messenger",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "keywords": [],
   "license": "ISC",
@@ -64,7 +64,9 @@
       ],
       "no-await-in-loop": "off",
       "default-case-last": "warn",
-      "no-underscore-dangle": "off"
+      "no-underscore-dangle": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": ["off"]
     }
   },
   "stylelint": {

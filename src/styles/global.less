@@ -53,3 +53,15 @@ hr {
     .flex-display();
     .flex-direction();
 }
+
+input {
+    &.valid {
+        outline-color: @green !important;
+        border-color: @green !important;
+    }
+
+    &.invalid {
+        outline-color: red !important;
+        border-color: red !important;
+    }
+}

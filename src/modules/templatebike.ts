@@ -13,10 +13,14 @@
  * TE.render(templateName, targetElem);
  */
 
+import * as importedTemplates from '../utils/importTemplates';
+
 const TEXT_NODE = 3;
 const ELEMENT_NODE = 1;
 
 export default class TemplateBike {
+    private static instance: TemplateBike;
+
     protected readonly regexp: {
         temptateExpression: RegExp;
         variable: RegExp;
@@ -25,14 +29,14 @@ export default class TemplateBike {
 
     protected readonly pathToTemplates: string;
 
-    protected templates: Promise<object>;
+    protected templates: any;
 
     protected renderedCollection: Element;
 
-    private _data: { [key: string]: any };
+    private _data?: { [key: string]: any } = {};
 
-    constructor(data = {}, pathToTemplates = '/src/pages') {
-        this.templates = import('../../src/pages/*/*.tbt'); // typescript ругается, но как по-другому запихать в parcel пачку шаблонов? 🤷‍♂️
+    private constructor(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages') {
+        this.templates = importedTemplates.tmpl;
         this._data = data;
         this.pathToTemplates = pathToTemplates;
         this.regexp = {
@@ -43,18 +47,31 @@ export default class TemplateBike {
         this.renderedCollection = document.createElement('div');
     }
 
-    public setData(key: string, value: any) {
-        this._data[key] = value;
-        return this._data;
+    public static getInstance(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages'): TemplateBike {
+        if (!TemplateBike.instance) {
+            TemplateBike.instance = new TemplateBike(data, pathToTemplates);
+        }
+        if (!TemplateBike.instance._data) {
+            TemplateBike.instance._data = data;
+        }
+
+        return TemplateBike.instance;
     }
 
     public get data():typeof this._data {
         return this._data;
     }
 
-    private renderNode(node: Element, dataset: Array<object> | boolean = false): Element {
+    // eslint-disable-next-line class-methods-use-this
+    public set data(_v) {
+        throw new Error('access denied');
+    }
+
+    private renderNode(node: Element, dataset: object | boolean = false): Element {
         if (node.hasChildNodes()) {
-            node.childNodes.forEach((child) => {
+            // foreach не подходит: при добавлении отрендеренных нод длина массива меняется
+            for (let i = 0; i < node.childNodes.length; i++) {
+                const child = node.childNodes[i];
                 const childElement = <Element> child;
                 if (child.nodeType === TEXT_NODE) { // если текстовая нода – парсим текст
                     childElement.textContent = this.renderExpressionString(
@@ -66,11 +83,11 @@ export default class TemplateBike {
                     this.renderNode(childElement, dataset);
                     if (childElement.hasAttributes()) { // и парсим значения атрибутов
                         const { attributes } = childElement;
-                        for (let i = 0; i < attributes.length; i++) {
+                        for (let j = 0; j < attributes.length; j++) {
                             childElement.setAttribute(
-                                attributes[i].name,
+                                attributes[j].name,
                                 this.renderExpressionString(
-                                    attributes[i].value,
+                                    attributes[j].value,
                                     childElement,
                                     dataset,
                                 ),
@@ -78,7 +95,7 @@ export default class TemplateBike {
                         }
                     }
                 }
-            });
+            }
         }
         return node;
     }
@@ -86,17 +103,22 @@ export default class TemplateBike {
     private renderExpressionString(
         string: string | null,
         currentNode:Element = document.body,
-        dataset: Array<object> | boolean = false,
+        dataset: object | boolean = false,
     ): string {
         if (string === null) return '';
         let hasTemplateExpression = this.regexp.temptateExpression.test(string);
         let renderedString = string;
         while (hasTemplateExpression) {
-            renderedString = renderedString.replace(this.regexp.temptateExpression, (m, found) => {
+            renderedString = renderedString.replace(this.regexp.temptateExpression, (_m, found) => {
                 const renderedVariable: string = found.replace(
                     this.regexp.variable,
                     (match: string, foundVariableName: string) => {
                         const varValue = this.getVariable(foundVariableName, dataset);
+                        if (varValue instanceof HTMLElement) {
+                            // если htmlelement - пихаем его прямо туда
+                            currentNode.before(varValue);
+                            return '';
+                        }
                         // если возвращается массив - пробуем искать закрывающий тег
                         if (Array.isArray(varValue)) {
                             return this.renderArray(foundVariableName, varValue, currentNode);
@@ -119,9 +141,9 @@ export default class TemplateBike {
         ) {
             node.parentElement.innerHTML = node.parentElement.innerHTML.replace(
                 this.regexp.each(foundVariableName),
-                (match, found) => {
+                (_match, found) => {
                     let eachNode = '';
-                    varValue.forEach((elem: Array<object>) => {
+                    varValue.forEach((elem) => {
                         const newNode = document.createElement('div');
                         newNode.innerHTML = found;
                         eachNode += this.renderNode(newNode, elem).innerHTML;
@@ -134,13 +156,22 @@ export default class TemplateBike {
         return JSON.stringify(varValue);
     }
 
-    private getVariable(variableName: string, dataset: Object = {}, defaultValue: string = ''): string | Array<object> {
+    private getVariable(
+        variableName: string,
+        dataset: Object = {},
+        defaultValue: string = '',
+    ): string | Array<object> | HTMLElement {
         let value: any;
         // если не передан контекст поиска (или передан пустой):
         if (Object.keys(dataset).length === 0) value = this._data;
         else value = dataset; // контекст передан
         const path = variableName.split('.');
-        path.forEach((key) => { value = value[key]; });
+        path.forEach((key) => {
+            if (value) {
+                value = value[key];
+            }
+            return value;
+        });
         if (value === undefined) {
             // переменная не найдена в контексте - ищем во всем объекте:
             if (Object.keys(dataset).length !== 0) {
@@ -148,7 +179,7 @@ export default class TemplateBike {
             }
             return defaultValue;
         }
-        if (Array.isArray(value)) return value;
+        if (Array.isArray(value) || value instanceof HTMLElement) return value;
         return value.toString() ?? defaultValue;
     }
 
@@ -162,35 +193,67 @@ export default class TemplateBike {
         return template.default;
     }
 
-    public async render(templateName: string, targetElem: Element | null = null) {
+    public async render(
+        templateName: string,
+        targetElem: Element | null = null,
+        dataset: object | boolean = false,
+    ): Promise<Element[]> {
         const template = await this.fetchTemplate(templateName);
         const element = document.createElement('div');
         element.innerHTML = template;
-        this.renderedCollection = <Element> this.renderNode(element);
+        this.renderedCollection = <Element> this.renderNode(element, dataset);
+        const collectionArray = this.collectionToArray(this.renderedCollection);
         if (targetElem != null) {
             this.appendTo(targetElem);
         }
-        return this.renderedCollection;
+        // return this.renderedCollection;
+        return collectionArray;
     }
 
-    public appendTo(targetElem: Element): Element {
+    private collectionToArray(renderedCollection = this.renderedCollection): Element[] {
+        const renderCollectionArray = [];
+        for (let i = 0; i < renderedCollection.childNodes.length; i++) {
+            renderCollectionArray.push(renderedCollection.childNodes[i]);
+        }
+        return renderCollectionArray as Element[];
+    }
+
+    public appendTo(
+        targetElem: Element | null,
+        renderedCollection: Element | Element[] = this.renderedCollection,
+        prepend = false,
+    ): Element | null {
         if (targetElem !== null) {
-            while (this.renderedCollection.childNodes.length > 0) {
-                targetElem.append(this.renderedCollection.childNodes[0]);
+            // while (renderedCollection.childNodes.length > 0) {
+            //     targetElem.append(renderedCollection.childNodes[0]);
+            // }
+            let colArr = [];
+            if (!Array.isArray(renderedCollection)) {
+                colArr = this.collectionToArray(renderedCollection);
+            } else {
+                colArr = renderedCollection;
             }
+            if (prepend) {
+                colArr.reverse();
+            }
+            colArr.forEach((e) => {
+                // вроде пробелы и переносы нам не очень нужны
+                if (!(e.nodeType === TEXT_NODE && (e.textContent === '\n' || e.textContent === ' '))) {
+                    if (prepend) {
+                        targetElem.prepend(e);
+                    } else {
+                        targetElem.append(e);
+                    }
+                }
+            });
         }
         return targetElem;
     }
 
-    public prependTo(targetElem: Element): Element {
-        if (targetElem !== null) {
-            while (this.renderedCollection.childNodes.length > 0) {
-                targetElem.prepend(
-                    this.renderedCollection
-                        .childNodes[this.renderedCollection.childNodes.length - 1],
-                );
-            }
-        }
-        return targetElem;
+    public prependTo(
+        targetElem: Element | null,
+        renderedCollection: Element | Element[] = this.renderedCollection,
+    ): Element | null {
+        return this.appendTo(targetElem, renderedCollection, true);
     }
 }

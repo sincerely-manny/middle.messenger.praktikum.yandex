@@ -1,22 +1,22 @@
 # Проект I модуля практикума
 =======
 
-Запуск: % npm start
+📎Запуск: % npm start
 
-Сборка: % npm run build
+📎Сборка: % npm run build
 
-Linting: % npm run lint
+📎Linting (eslint && stylelint): % npm run lint
 
 
-Шаблон:
+### 📝Шаблон:
 https://www.figma.com/file/pkDI0nw7lW2OSNCXr8xpbj/Messenger?node-id=0%3A1
 
-Хост:
+### 💾Хост:
 https://62663d9c2fa9644e93fd88c8--clever-capybara-2d731e.netlify.app
 
 
 
-Страницы:
+### 📑Страницы:
 
 /#signin – Авторизация
 

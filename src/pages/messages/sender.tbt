@@ -1,4 +1,0 @@
-<section class="sender">
-    <img src="{{$sender.avatar}}" alt="" class="avatar">
-    <span class="name">{{$sender.display_name}} said:</span> 
-</section>
