@@ -22,9 +22,9 @@ https://62663d9c2fa9644e93fd88c8--clever-capybara-2d731e.netlify.app
 
 /#signup – Регистрация
 
-/#nochat – Список чатов
+/#chat – Список чатов
 
-/#chat – Лента переписки
+/#chat5 – Лента переписки
 
 /#profile – Настройки пользователя
 
