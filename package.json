@@ -10,7 +10,7 @@
     "build": "parcel build static/index.html",
     "start": "npm run build && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "echo \"ESLINT: \" && node_modules/.bin/eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\""
+    "lint": "echo \"ESLINT: \" && npx eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\""
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "2.5.0",

@@ -1,18 +1,14 @@
-const METHODS = {
-    GET: 'GET',
-    POST: 'POST',
-    PUT: 'PUT',
-    PATCH: 'PATCH',
-    DELETE: 'DELETE',
-};
+enum METHODS {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    PATCH = 'PATCH',
+    DELETE = 'DELETE',
+}
 
 type Options = {
-    headers?: {
-        [s: string]: string
-    },
-    data?: {
-        [s: string]: string
-    },
+    headers?: Record<string, string>,
+    data?: Record<string, string>,
     timeout?: number,
     method?: typeof METHODS[keyof typeof METHODS],
 };
