@@ -2,7 +2,7 @@
   "short_name": "PracticumMessenger",
   "name": "PracticumMessenger",
   "icons": [{
-    "src": "img/favicon96.png",
+    "src": "img/icons/favicon96.png",
     "type": "image/png",
     "sizes": "96x96"
   }],

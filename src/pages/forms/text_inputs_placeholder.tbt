@@ -1,3 +1,0 @@
-{{$form_data.fields}}
-<input type="{{$type}}" value="{{$value}}" placeholder="{{$placeholder}}" name="{{$name}}" class="{{$class}}">
-{{/$form_data.fields}}

@@ -1,8 +1,0 @@
-<div class="no_active_chat">
-    <div>
-        <svg width="619" height="619" viewBox="0 0 619 619" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M588.05 123.8H526.15V402.35H123.8V464.25C123.8 481.273 137.728 495.2 154.75 495.2H495.2L619 619V154.75C619 137.728 605.073 123.8 588.05 123.8ZM464.25 309.5V30.95C464.25 13.9275 450.323 0 433.3 0H30.95C13.9275 0 0 13.9275 0 30.95V464.25L123.8 340.45H433.3C450.323 340.45 464.25 326.523 464.25 309.5Z" fill="#0A0A0A" fill-opacity="0.3"/>
-        </svg>
-        <p class="note">Select a chat to start messaging</p>
-    </div>
-</div>

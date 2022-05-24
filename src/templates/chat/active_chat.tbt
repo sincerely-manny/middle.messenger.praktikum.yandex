@@ -1,0 +1,10 @@
+<div class="active-chat-container">
+    <div class="active-chat-messages-container" id="active-chat-messages_container">
+        <div id="active-chat-messages">
+           
+        </div>
+    </div>
+    <div id="active-chat-new-message">
+    
+    </div>
+</div>

@@ -1,4 +1,0 @@
-<form action="#nochat" class="sign_form">
-    <input type="submit" value="GO!">
-    <p>{{$form_data.message}} <a href="{{$form_data.link.href}}">{{$form_data.link.text}}</a></p>
-</form>
