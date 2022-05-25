@@ -31,7 +31,7 @@ export default class TemplateBike {
 
     protected templates: any;
 
-    protected renderedCollection: Element;
+    protected renderedCollection: HTMLElement;
 
     private _data?: { [key: string]: any } = {};
 
@@ -67,12 +67,12 @@ export default class TemplateBike {
         throw new Error('access denied');
     }
 
-    private renderNode(node: Element, dataset: object | boolean = false): Element {
+    private renderNode(node: HTMLElement, dataset: object | boolean = false): HTMLElement {
         if (node.hasChildNodes()) {
             // foreach не подходит: при добавлении отрендеренных нод длина массива меняется
             for (let i = 0; i < node.childNodes.length; i++) {
                 const child = node.childNodes[i];
-                const childElement = <Element> child;
+                const childElement = <HTMLElement> child;
                 if (child.nodeType === TEXT_NODE) { // если текстовая нода – парсим текст
                     childElement.textContent = this.renderExpressionString(
                         child.textContent,
@@ -102,7 +102,7 @@ export default class TemplateBike {
 
     private renderExpressionString(
         string: string | null,
-        currentNode:Element = document.body,
+        currentNode:HTMLElement = document.body,
         dataset: object | boolean = false,
     ): string {
         if (string === null) return '';
@@ -133,8 +133,12 @@ export default class TemplateBike {
         return renderedString;
     }
 
-    private renderArray(foundVariableName: string, varValue: Array<object>, currentNode: Element) {
-        const node = <Element> currentNode;
+    private renderArray(
+        foundVariableName: string,
+        varValue: Array<object>,
+        currentNode: HTMLElement,
+    ) {
+        const node = <HTMLElement> currentNode;
         if (
             node.parentElement !== null
             && this.regexp.each(foundVariableName).test(node.parentElement.innerHTML)
@@ -195,13 +199,13 @@ export default class TemplateBike {
 
     public async render(
         templateName: string,
-        targetElem: Element | null = null,
+        targetElem: HTMLElement | null = null,
         dataset: object | boolean = false,
-    ): Promise<Element[]> {
+    ): Promise<HTMLElement[]> {
         const template = await this.fetchTemplate(templateName);
         const element = document.createElement('div');
         element.innerHTML = template;
-        this.renderedCollection = <Element> this.renderNode(element, dataset);
+        this.renderedCollection = <HTMLElement> this.renderNode(element, dataset);
         const collectionArray = this.collectionToArray(this.renderedCollection);
         if (targetElem != null) {
             this.appendTo(targetElem);
@@ -210,19 +214,19 @@ export default class TemplateBike {
         return collectionArray;
     }
 
-    private collectionToArray(renderedCollection = this.renderedCollection): Element[] {
+    private collectionToArray(renderedCollection = this.renderedCollection): HTMLElement[] {
         const renderCollectionArray = [];
         for (let i = 0; i < renderedCollection.childNodes.length; i++) {
             renderCollectionArray.push(renderedCollection.childNodes[i]);
         }
-        return renderCollectionArray as Element[];
+        return renderCollectionArray as HTMLElement[];
     }
 
     public appendTo(
-        targetElem: Element | null,
-        renderedCollection: Element | Element[] = this.renderedCollection,
+        targetElem: HTMLElement | null,
+        renderedCollection: HTMLElement | HTMLElement[] = this.renderedCollection,
         prepend = false,
-    ): Element | null {
+    ): HTMLElement | null {
         if (targetElem !== null) {
             // while (renderedCollection.childNodes.length > 0) {
             //     targetElem.append(renderedCollection.childNodes[0]);
@@ -251,9 +255,9 @@ export default class TemplateBike {
     }
 
     public prependTo(
-        targetElem: Element | null,
-        renderedCollection: Element | Element[] = this.renderedCollection,
-    ): Element | null {
+        targetElem: HTMLElement | null,
+        renderedCollection: HTMLElement | HTMLElement[] = this.renderedCollection,
+    ): HTMLElement | null {
         return this.appendTo(targetElem, renderedCollection, true);
     }
 }

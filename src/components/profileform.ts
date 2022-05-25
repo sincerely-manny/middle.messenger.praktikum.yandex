@@ -34,7 +34,7 @@ export class ProfileForm extends Form {
         } else {
             submit.hidden = true;
         }
-        form.append(submit as Element);
+        form.append(submit as HTMLElement);
 
         this.form = form as HTMLFormElement;
         form.addEventListener('submit', this._props.onSubmit);

@@ -17,7 +17,7 @@ export type ModalFormData = {
 };
 
 export class ModalForm extends Form {
-    private html?: Element;
+    private html?: HTMLElement;
 
     constructor(data: ModalFormData) {
         super(data as ModalFormData);
@@ -37,7 +37,7 @@ export class ModalForm extends Form {
         this.form = form as HTMLFormElement;
         form.querySelector('a')?.addEventListener('click', this._props.link.onclick);
         form.addEventListener('submit', this._props.onSubmit);
-        let inputs: Element[] = [];
+        let inputs: HTMLElement[] = [];
         this._props.fields.forEach((i: InputData) => {
             inputs = inputs.concat(this.createInput(i));
         });

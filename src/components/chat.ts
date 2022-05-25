@@ -27,9 +27,9 @@ export class Chat implements IChat {
 
     private me: User;
 
-    public listHtmlElement: Element | undefined;
+    public listHtmlElement: HTMLElement | undefined;
 
-    public chatHtmlElement: Element | undefined;
+    public chatHtmlElement: HTMLElement | undefined;
 
     constructor(user_id: number, messages: Message[], me: User) {
         this.user_id = user_id;
@@ -101,8 +101,8 @@ export class Chat implements IChat {
             return [this.chatHtmlElement];
         }
         const container = TE.render('chat/active_chat', null, this);
-        const msgContainer = (await container)[0].querySelector('#active-chat-messages');
-        const newMsgContainer = (await container)[0].querySelector('#active-chat-new-message');
+        const msgContainer = (await container)[0].querySelector('#active-chat-messages') as HTMLElement;
+        const newMsgContainer = (await container)[0].querySelector('#active-chat-new-message') as HTMLElement;
         this.renderMessages(this, msgContainer);
         TE.render('chat/new_message_form', newMsgContainer);
         [this.chatHtmlElement] = (await container);
@@ -115,7 +115,7 @@ export class Chat implements IChat {
         return tempDiv;
     }
 
-    private async renderMessages(chat: Chat, msgContainer: Element | null) {
+    private async renderMessages(chat: Chat, msgContainer: HTMLElement | null) {
         let sender = {} as User;
         let currShownDate: string | undefined;
 

@@ -122,7 +122,7 @@ export async function profile() {
         password_form: passwordForm.render(),
     });
     const avatar = await TE.render('profile/avatar_input', null);
-    TE.prependTo(profileForm.form as Element, avatar);
+    TE.prependTo(profileForm.form as HTMLElement, avatar);
 }
 
 ETB.subcribe(Event.PROFILE_FORM_IS_Submitted, () => profileForm.logObject());

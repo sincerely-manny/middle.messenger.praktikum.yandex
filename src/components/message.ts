@@ -24,7 +24,7 @@ export class Message implements IMessage {
 
     time: string;
 
-    htmlElement: Element | undefined;
+    htmlElement: HTMLElement | undefined;
 
     constructor(_message: IMessage) {
         Object.assign(this, _message);

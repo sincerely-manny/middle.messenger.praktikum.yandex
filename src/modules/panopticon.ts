@@ -2,7 +2,7 @@
 
 type ElemState = {
     placed: boolean,
-    html: Element,
+    html: HTMLElement,
     module?: string,
 };
 

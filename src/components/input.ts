@@ -33,8 +33,8 @@ export class InputField {
         this._props = data;
     }
 
-    public render(): Element[] {
-        const form: Element[] = [];
+    public render(): HTMLElement[] {
+        const form: HTMLElement[] = [];
         const input = document.createElement('input');
         const rnd = Math.floor(Math.random() * 1000);
         input.type = this._props.type;
@@ -49,7 +49,7 @@ export class InputField {
                 htmlFor: `${this._props.name}_input-${rnd}`,
                 textContent: this._props.label.value_before,
             });
-            form.push(label as Element);
+            form.push(label as HTMLElement);
         }
         form.push(input);
         if (this._props.label?.value_after) {
@@ -58,7 +58,7 @@ export class InputField {
                 htmlFor: `${this._props.name}_input-${rnd}`,
                 textContent: this._props.label.value_after,
             });
-            form.push(label as Element);
+            form.push(label as HTMLElement);
         }
         this.html = input;
         if (this._props.validate) {
