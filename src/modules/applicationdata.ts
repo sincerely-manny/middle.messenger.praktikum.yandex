@@ -50,14 +50,6 @@ const applicationData: ApplicationData = {
     },
 };
 
-// applicationData.chats = chats.map(
-//     (e) => new Chat(
-//         e.user_id,
-//         e.messages as Message[],
-//         applicationData.user,
-//     ),
-// );
-
 export const appData = new Proxy(applicationData, {
     get(target, key) {
         return target[key as keyof typeof target];
@@ -67,7 +59,6 @@ export const appData = new Proxy(applicationData, {
     },
 });
 
-// eslint-disable-next-line no-new
 TE.data = appData;
 
 export default { appData };

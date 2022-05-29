@@ -97,14 +97,7 @@ export default class ChatsList extends Block {
         const container = document.getElementById('active-chat');
         const chatCont = document.getElementById('active-chat-messages_container');
         if (chatCont) {
-            // setTimeout(() => {
-            if (container) {
-                container.style.transition = 'opacity 0.3s, filter 0.5s';
-                container.style.opacity = '1';
-                container.style.filter = 'blur(0)';
-            }
             chatCont.scrollTo({ top: chatCont.scrollHeight });
-            // }, 300);
         }
     }
 

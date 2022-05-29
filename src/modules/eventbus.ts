@@ -65,7 +65,6 @@ export class EventTrolleyBus {
             this.subsctiptions[event].forEach((handler) => handler(...args));
             return true;
         }
-        // throw new Error(`Нет события ${Event[event]}`);
         return false;
     }
 }

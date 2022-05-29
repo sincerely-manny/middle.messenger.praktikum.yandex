@@ -229,9 +229,6 @@ export class TemplateBike {
         prepend = false,
     ): HTMLElement | null {
         if (targetElem !== null) {
-            // while (renderedCollection.childNodes.length > 0) {
-            //     targetElem.append(renderedCollection.childNodes[0]);
-            // }
             let colArr = [];
             if (!Array.isArray(renderedCollection)) {
                 colArr = this.collectionToArray(renderedCollection);
