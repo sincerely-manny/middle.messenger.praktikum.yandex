@@ -1,24 +1,51 @@
 export default abstract class Block {
-    protected _parent: HTMLElement;
-
     protected _element: HTMLElement;
 
     protected _props: Record<string, any>;
 
-    constructor(parent: HTMLElement = document.body, props: Record<string, any> = {}) {
-        this._element = this.render();
-        this._parent = parent;
+    protected _isPlaced: boolean = false;
+
+    protected _isRendered?: Promise<HTMLElement[]>;
+
+    constructor(props: Record<string, any> = {}) {
         this._props = props;
+        this._element = this.render();
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    private render(): HTMLElement {
+    get element() {
+        return this._element;
+    }
+
+    get isPlaced() {
+        return this._isPlaced;
+    }
+
+    protected render(id?: string): HTMLElement {
         const div = document.createElement('div');
+        if (id) {
+            div.id = id;
+        }
         return div;
     }
 
-    public place() {
-        this._parent.append(this._element);
+    public async place(parent: HTMLElement) {
+        if (!this._isPlaced) {
+            if (this._isRendered instanceof Promise) {
+                await this._isRendered;
+            }
+            this.moveChildren(this._element, parent);
+            this._element = parent;
+            this._isPlaced = true;
+        }
+        return this._element;
+    }
+
+    public unload() {
+        const tempDiv = document.createElement('div');
+        if (this._element) this.moveChildren(this._element, tempDiv);
+        this._element = tempDiv;
+        this._isPlaced = false;
+        return tempDiv;
     }
 
     public show() {
@@ -27,5 +54,21 @@ export default abstract class Block {
 
     public hide() {
         this._element.style.display = 'none';
+    }
+
+    protected childById(id: string, parent: HTMLElement = document.body): HTMLElement {
+        let elem = parent.querySelector(`#${id}`);
+        if (!elem) {
+            elem = document.createElement('div');
+            elem.id = id;
+            parent.append(elem);
+        }
+        return elem as HTMLElement;
+    }
+
+    protected moveChildren(from: HTMLElement, to: HTMLElement) {
+        while (from.childNodes.length > 0 && from !== to) {
+            to.append(from.childNodes[0]);
+        }
     }
 }

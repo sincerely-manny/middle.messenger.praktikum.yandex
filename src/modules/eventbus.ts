@@ -1,4 +1,8 @@
-export enum Event {
+export enum AppEvent {
+    CHATS_LIST_IS_Rendered,
+    CHATS_LIST_IS_Rendered_async,
+    CHATS_LIST_HEADER_IS_Rendered,
+    CHATS_LIST_IS_Placed,
     CHAT_LI_IS_Clicked,
     CHAT_IS_Rendered,
     CHAT_IS_Placed,
@@ -11,6 +15,7 @@ export enum Event {
     MODAL_SignIn_IS_Called,
     MODAL_SignUp_IS_Called,
     MODAL_IS_Closed,
+    PROFILE_IS_Rendered,
     PROFILE_IS_Called,
     PROFILE_IS_Closed,
     ERROR_IS_Called,
@@ -21,27 +26,24 @@ export enum Event {
 }
 
 type Subscription = {
-    [key in Event]: Function[];
+    [key in AppEvent]: Function[];
 };
 
 export class EventTrolleyBus {
     private static instance: EventTrolleyBus;
 
-    public subsctiptions: Subscription;
+    public subsctiptions!: Subscription;
 
-    private constructor() {
-        this.subsctiptions = {} as Subscription;
-    }
-
-    public static getInstance(): EventTrolleyBus {
-        if (!EventTrolleyBus.instance) {
-            EventTrolleyBus.instance = new EventTrolleyBus();
+    constructor() {
+        if (EventTrolleyBus.instance) {
+            return EventTrolleyBus.instance;
         }
 
-        return EventTrolleyBus.instance;
+        this.subsctiptions = {} as Subscription;
+        EventTrolleyBus.instance = this;
     }
 
-    public subcribe(event: Event, handler: Function):Function[] {
+    public subcribe(event: AppEvent, handler: Function):Function[] {
         if (!this.subsctiptions[event]) {
             this.subsctiptions[event] = [];
         }
@@ -49,7 +51,7 @@ export class EventTrolleyBus {
         return this.subsctiptions[event];
     }
 
-    public unsubscribe(event: Event, handler: Function | null = null):Function[] {
+    public unsubscribe(event: AppEvent, handler: Function | null = null):Function[] {
         if (!this.subsctiptions[event]) {
             this.subsctiptions[event] = [];
         }
@@ -58,7 +60,7 @@ export class EventTrolleyBus {
         return this.subsctiptions[event];
     }
 
-    public trigger(event: Event, ...args: any) {
+    public trigger(event: AppEvent, ...args: any) {
         if (this.subsctiptions[event]) {
             this.subsctiptions[event].forEach((handler) => handler(...args));
             return true;
@@ -68,6 +70,6 @@ export class EventTrolleyBus {
     }
 }
 
-export const ETB = EventTrolleyBus.getInstance();
+export const ETB = new EventTrolleyBus();
 
-export default { Event, EventTrolleyBus, ETB };
+export default { AppEvent, EventTrolleyBus, ETB };

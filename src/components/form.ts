@@ -11,7 +11,6 @@ export abstract class Form {
         this._props = data;
     }
 
-    // eslint-disable-next-line class-methods-use-this
     public render() {
 
     }
@@ -40,7 +39,6 @@ export abstract class Form {
         }
     }
 
-    // eslint-disable-next-line class-methods-use-this
     private compare(oldV: any, newV: any) {
         return Object.keys(oldV).every(
             (key) => (

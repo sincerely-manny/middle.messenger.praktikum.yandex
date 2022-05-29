@@ -18,24 +18,31 @@ import * as importedTemplates from '../utils/importTemplates';
 const TEXT_NODE = 3;
 const ELEMENT_NODE = 1;
 
-export default class TemplateBike {
+export class TemplateBike {
     private static instance: TemplateBike;
 
-    protected readonly regexp: {
+    protected readonly regexp!: {
         temptateExpression: RegExp;
         variable: RegExp;
         each: (marker: any) => RegExp;
     };
 
-    protected readonly pathToTemplates: string;
+    protected readonly pathToTemplates!: string;
 
     protected templates: any;
 
-    protected renderedCollection: HTMLElement;
+    protected renderedCollection!: HTMLElement;
 
     private _data?: { [key: string]: any } = {};
 
-    private constructor(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages') {
+    constructor(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages') {
+        if (TemplateBike.instance) {
+            if (!TemplateBike.instance._data) {
+                TemplateBike.instance._data = data;
+            }
+            return TemplateBike.instance;
+        }
+
         this.templates = importedTemplates.tmpl;
         this._data = data;
         this.pathToTemplates = pathToTemplates;
@@ -45,26 +52,20 @@ export default class TemplateBike {
             each(marker) { return new RegExp(`{{\\$${marker}}}([^]*){{/\\$${marker}}}`, 'gi'); },
         };
         this.renderedCollection = document.createElement('div');
-    }
 
-    public static getInstance(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages'): TemplateBike {
-        if (!TemplateBike.instance) {
-            TemplateBike.instance = new TemplateBike(data, pathToTemplates);
-        }
-        if (!TemplateBike.instance._data) {
-            TemplateBike.instance._data = data;
-        }
-
-        return TemplateBike.instance;
+        TemplateBike.instance = this;
     }
 
     public get data():typeof this._data {
         return this._data;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    public set data(_v) {
-        throw new Error('access denied');
+    public set data(v) {
+        if (!this._data) {
+            this._data = v;
+        } else {
+            throw new Error('access denied');
+        }
     }
 
     private renderNode(node: HTMLElement, dataset: object | boolean = false): HTMLElement {
@@ -261,3 +262,7 @@ export default class TemplateBike {
         return this.appendTo(targetElem, renderedCollection, true);
     }
 }
+
+export const TE = new TemplateBike();
+
+export default { TemplateBike, TE };

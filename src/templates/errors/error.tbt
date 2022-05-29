@@ -3,7 +3,7 @@
     <h1>{{$num}}</h1>
     <h5>{{$text}}</h5>
     <p>{{$comment}}</p>
-    <a href="#chat" class="goback">Go back to chats</a>
+    <a href="/messenger" class="goback">Go back to chats</a>
   </div>
 </article>
   

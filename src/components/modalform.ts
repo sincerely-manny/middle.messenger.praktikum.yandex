@@ -1,8 +1,6 @@
-import TemplateBike from '../modules/templatebike';
+import { TE } from '../modules/templatebike';
 import { Form } from './form';
 import { InputData } from './input';
-
-const TE = TemplateBike.getInstance();
 
 export type ModalFormData = {
     header: string,

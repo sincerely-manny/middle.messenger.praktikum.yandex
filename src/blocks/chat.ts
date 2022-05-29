@@ -1,18 +1,18 @@
-import { Message } from './message';
+import { Message } from '../components/message';
 import { User } from '../modules/user';
 import { users } from '../models/dummy_data/users';
 import { chats } from '../models/dummy_data/chats';
-import TemplateBike from '../modules/templatebike';
+import { TE } from '../modules/templatebike';
 import weekday from '../utils/weekdays';
-
-const TE = TemplateBike.getInstance();
+import Block from '../components/block';
+import { AppEvent, ETB } from '../modules/eventbus';
 
 export interface IChat {
     user_id: number,
     messages: Message[],
 }
 
-export class Chat implements IChat {
+export class Chat extends Block implements IChat {
     public user_id: number;
 
     private _messages: Message[];
@@ -29,22 +29,23 @@ export class Chat implements IChat {
 
     public listHtmlElement: HTMLElement | undefined;
 
-    public chatHtmlElement: HTMLElement | undefined;
-
-    constructor(user_id: number, messages: Message[], me: User) {
-        this.user_id = user_id;
-        this.me = me;
-        if (messages.length === 0) {
+    constructor(
+        props: { user_id: number, messages: Message[], me: User },
+    ) {
+        super(props);
+        this.user_id = props.user_id;
+        this.me = props.me;
+        if (props.messages.length === 0) {
             this._messages = this.fetchMessages();
         } else {
-            this._messages = messages;
+            this._messages = props.messages;
         }
         this._messages = this._messages.map((m) => new Message(m));
         let preview = this._messages[this._messages.length - 1].text;
         if (preview && preview.length > 90) {
             preview = `${[...preview].slice(0, 90).join('').trim()}...`;
         }
-        const unread = this._messages.filter((m) => (m.user_id !== me.id && m.status === 'unread')).length;
+        const unread = this._messages.filter((m) => (m.user_id !== this.me.id && m.status === 'unread')).length;
         let time;
         const { timestamp } = this._messages[this.messages.length - 1];
         const dateObj = new Date(timestamp);
@@ -75,7 +76,6 @@ export class Chat implements IChat {
         return this._messages;
     }
 
-    // eslint-disable-next-line class-methods-use-this
     public set messages(_messages) {
         throw new Error('access denied');
     }
@@ -96,23 +96,26 @@ export class Chat implements IChat {
         return messages;
     }
 
-    public async render() {
-        if (this.chatHtmlElement) {
-            return [this.chatHtmlElement];
-        }
-        const container = TE.render('chat/active_chat', null, this);
-        const msgContainer = (await container)[0].querySelector('#active-chat-messages') as HTMLElement;
-        const newMsgContainer = (await container)[0].querySelector('#active-chat-new-message') as HTMLElement;
-        this.renderMessages(this, msgContainer);
-        TE.render('chat/new_message_form', newMsgContainer);
-        [this.chatHtmlElement] = (await container);
+    public render() {
+        const container = document.createElement('div');
+        container.id = 'active-chat-container';
+        this._isRendered = this.renderAsync();
         return container;
     }
 
-    public unload() {
-        const tempDiv = document.createElement('div');
-        if (this.chatHtmlElement) tempDiv.append(this.chatHtmlElement);
-        return tempDiv;
+    private async renderAsync() {
+        if (this._element) {
+            return [this._element];
+        }
+        const activeChat = TE.render('chat/active_chat', this._element, this);
+        const msgContainer = (await activeChat)[0].querySelector('#active-chat-messages') as HTMLElement;
+        const newMsgContainer = (await activeChat)[0].querySelector('#active-chat-new-message') as HTMLElement;
+        this.renderMessages(this, msgContainer).then(() => {
+            ETB.trigger(AppEvent.CHAT_IS_Rendered, this);
+        });
+        TE.render('chat/new_message_form', newMsgContainer);
+        [this._element] = (await activeChat);
+        return activeChat;
     }
 
     private async renderMessages(chat: Chat, msgContainer: HTMLElement | null) {
@@ -142,6 +145,12 @@ export class Chat implements IChat {
             }
         }
         return msgContainer;
+    }
+
+    public async place(parent: HTMLElement) {
+        await super.place(parent);
+        ETB.trigger(AppEvent.CHAT_IS_Placed, this);
+        return this._element;
     }
 }
 

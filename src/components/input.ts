@@ -71,7 +71,6 @@ export class InputField {
         return form;
     }
 
-    // eslint-disable-next-line class-methods-use-this
     private validate(input: HTMLInputElement, rule: keyof typeof rules | undefined = 'message'): boolean {
         const isValid = rules[rule].test(input.value);
         if (isValid) {

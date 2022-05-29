@@ -52,7 +52,6 @@ export default class HTTPTransport {
         );
     }
 
-    // eslint-disable-next-line class-methods-use-this
     request(url: string, options: Options, timeout = 5000) {
         let { method } = options;
         const { data } = options;

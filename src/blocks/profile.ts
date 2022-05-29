@@ -1,20 +1,15 @@
-import { ETB, Event } from '../modules/eventbus';
-import TemplateBike from '../modules/templatebike';
-import { chats } from './chats';
+import Block from '../components/block';
 import { ProfileForm, ProfileFormData } from '../components/profileform';
 import { appData } from '../modules/applicationdata';
-
-const TE = TemplateBike.getInstance();
-
-let profileForm: ProfileForm;
-let passwordForm: ProfileForm;
+import { AppEvent, ETB } from '../modules/eventbus';
+import { TE } from '../modules/templatebike';
 
 const forms = {
     profile: {
         action: '#profile',
         onSubmit: (e: any) => {
             e.preventDefault();
-            ETB.trigger(Event.PROFILE_FORM_IS_Submitted);
+            ETB.trigger(AppEvent.PROFILE_FORM_IS_Submitted);
         },
         fields: [
             {
@@ -77,7 +72,7 @@ const forms = {
         action: '#profile',
         onSubmit: (e: any) => {
             e.preventDefault();
-            ETB.trigger(Event.PASSWORD_FORM_IS_Submitted);
+            ETB.trigger(AppEvent.PASSWORD_FORM_IS_Submitted);
         },
         submit: 'Change password',
         fields: [
@@ -111,21 +106,43 @@ const forms = {
     },
 };
 
-export async function profile() {
-    ETB.trigger(Event.PROFILE_IS_Called);
-    await chats();
-    profileForm = new ProfileForm(forms.profile as ProfileFormData);
-    passwordForm = new ProfileForm(forms.password as ProfileFormData);
-    // alert(profileForm.render() instanceof HTMLElement);
-    await TE.render('profile/profile', document.getElementById('active-chat'), {
-        profile_form: profileForm.render(),
-        password_form: passwordForm.render(),
-    });
-    const avatar = await TE.render('profile/avatar_input', null);
-    TE.prependTo(profileForm.form as HTMLElement, avatar);
+export class Profile extends Block {
+    private static instance: Profile;
+
+    private profileForm?: ProfileForm;
+
+    private passwordForm?: ProfileForm;
+
+    constructor() {
+        if (Profile.instance) {
+            return Profile.instance;
+        }
+        super(appData);
+        Profile.instance = this;
+    }
+
+    public render(): HTMLElement {
+        const container = super.render('user-profile');
+        this._isRendered = this.renderAsync();
+        return container;
+    }
+
+    private async renderAsync() {
+        if (this._element) {
+            return [this._element];
+        }
+        this.profileForm = new ProfileForm(forms.profile as ProfileFormData);
+        this.passwordForm = new ProfileForm(forms.password as ProfileFormData);
+        const block = await TE.render('profile/profile', null, {
+            profile_form: this.profileForm?.render(),
+            password_form: this.passwordForm?.render(),
+        });
+        TE.appendTo(this._element, block);
+        const avatar = await TE.render('profile/avatar_input', null);
+        TE.prependTo(this.profileForm?.form as HTMLElement, avatar);
+        ETB.trigger(AppEvent.PROFILE_IS_Rendered);
+        return block;
+    }
 }
 
-ETB.subcribe(Event.PROFILE_FORM_IS_Submitted, () => profileForm.logObject());
-ETB.subcribe(Event.PASSWORD_FORM_IS_Submitted, () => passwordForm.logObject());
-
-export default { profile };
+export default { Block };

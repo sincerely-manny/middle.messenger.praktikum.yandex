@@ -1,12 +1,8 @@
-import { ETB, Event } from '../modules/eventbus';
+import Block from '../components/block';
 import { ModalForm, ModalFormData } from '../components/modalform';
-import TemplateBike from '../modules/templatebike';
+import { AppEvent, ETB } from '../modules/eventbus';
 
-const TE = TemplateBike.getInstance();
-
-let mf: ModalForm | undefined;
-
-const formData = {
+export const formData = {
     signIn: {
         header: 'Sign in',
         message: 'Don’t have an account?',
@@ -14,7 +10,7 @@ const formData = {
             text: 'Sign up',
             href: '#signup',
             onclick: () => {
-                ETB.trigger(Event.MODAL_SignUp_IS_Called);
+                ETB.trigger(AppEvent.MODAL_SignUp_IS_Called);
             },
         },
         fields: [
@@ -44,7 +40,7 @@ const formData = {
             text: 'Sign in',
             href: '#signin',
             onclick: () => {
-                ETB.trigger(Event.MODAL_SignIn_IS_Called);
+                ETB.trigger(AppEvent.MODAL_SignIn_IS_Called);
             },
         },
         fields: [
@@ -109,94 +105,29 @@ const formData = {
     } as ModalFormData,
 };
 
-async function placeModal(fd: ModalFormData) {
-    mf = new ModalForm(
-        {
-            ...fd,
-            onSubmit: (e: any) => {
-                e.preventDefault();
-                ETB.trigger(Event.MODAL_FORM_IS_Submitted, mf);
-            },
-        },
-    );
-    const container = document.getElementById('container');
-    const mfHtml = await mf.render();
-    ETB.trigger(Event.MODAL_IS_Rendered);
-    if (container) {
-        container.append(mfHtml);
-        ETB.trigger(Event.MODAL_IS_Placed);
+export class SignInUpForm extends Block {
+    protected render(): HTMLElement {
+        const container = super.render('modal-form');
+        this._isRendered = this.renderAsync();
+        return container;
+    }
+
+    protected async renderAsync() {
+        const mf = new ModalForm(
+            {
+                ...this._props,
+                onSubmit: (e: any) => {
+                    e.preventDefault();
+                    ETB.trigger(AppEvent.MODAL_FORM_IS_Submitted, mf);
+                },
+            } as ModalFormData,
+
+        );
+        const mfHtml = await mf.render();
+        ETB.trigger(AppEvent.MODAL_IS_Rendered);
+        this._element.append(mfHtml);
+        return [mfHtml];
     }
 }
 
-function signIn() {
-    if (!mf) {
-        placeModal(formData.signIn);
-    } else {
-        mf.props = {
-            ...formData.signIn,
-            onSubmit: (e: any) => {
-                e.preventDefault();
-                ETB.trigger(Event.MODAL_FORM_IS_Submitted, mf);
-            },
-        };
-    }
-}
-
-function signUp() {
-    if (!mf) {
-        placeModal(formData.signUp);
-    } else {
-        mf.props = {
-            ...formData.signUp,
-            onSubmit: (e: any) => {
-                e.preventDefault();
-                ETB.trigger(Event.MODAL_FORM_IS_Submitted, mf);
-            },
-        };
-    }
-}
-
-function blurBg(on: boolean = true) {
-    ['chats-list', 'active-chat'].forEach((e) => {
-        const elem = document.getElementById(e);
-        if (elem) {
-            elem.style.filter = on ? 'blur(10px)' : 'blur(0px)';
-        }
-    });
-}
-
-export async function login(f: 'signin' | 'signup' = 'signin') {
-    if (!document.getElementById('chats-list')) {
-        const container = document.getElementById('container');
-        if (container) {
-            container.innerHTML = '';
-        }
-        await TE.render('general/main', document.getElementById('container'));
-    }
-    blurBg();
-    switch (f) {
-        case 'signup':
-            signUp();
-            break;
-        case 'signin':
-        default:
-            signIn();
-            break;
-    }
-}
-
-export function close() {
-    blurBg(false);
-    ETB.trigger(Event.MODAL_IS_Closed, mf);
-    mf?.destroy();
-    mf = undefined;
-}
-
-ETB.subcribe(Event.MODAL_FORM_IS_Submitted, (m: ModalForm) => { m.logObject(); });
-ETB.subcribe(Event.MODAL_FORM_IS_Submitted, close);
-ETB.subcribe(Event.MODAL_FORM_IS_Submitted, () => { window.location.hash = 'chat'; });
-ETB.subcribe(Event.PROFILE_IS_Called, close);
-ETB.subcribe(Event.ERROR_IS_Called, close);
-ETB.subcribe(Event.CHAT_LI_IS_Clicked, close);
-
-export default { login, close };
+export default { formData, SignInUpForm };
