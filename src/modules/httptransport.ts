@@ -8,9 +8,10 @@ enum METHODS {
 
 type Options = {
     headers?: Record<string, string>,
-    data?: Record<string, string>,
+    data?: Record<string, string> | FormData,
     timeout?: number,
     method?: typeof METHODS[keyof typeof METHODS],
+    credentials?: boolean,
 };
 
 export default class HTTPTransport {
@@ -52,15 +53,18 @@ export default class HTTPTransport {
         );
     }
 
-    request(url: string, options: Options, timeout = 5000) {
+    request(url: string, options: Options, timeout = 5000): Promise<XMLHttpRequest> {
         let { method } = options;
-        const { data } = options;
+        const { credentials, data } = options;
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
 
             if (!method) {
                 method = METHODS.GET;
+            }
+            if (credentials) {
+                xhr.withCredentials = credentials;
             }
             xhr.open(method, url);
             xhr.timeout = timeout;
@@ -80,6 +84,8 @@ export default class HTTPTransport {
 
             if (method === METHODS.GET || !data) {
                 xhr.send();
+            } else if (data instanceof FormData) {
+                xhr.send(data);
             } else {
                 xhr.send(JSON.stringify(data));
             }

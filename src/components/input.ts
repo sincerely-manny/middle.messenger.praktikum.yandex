@@ -1,8 +1,8 @@
 const rules = {
     password: /(?=(.*[0-9]))((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z]))^.{8,40}$/,
-    email: /^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/,
+    email: /^\S+@\S+$/,
     username: /^(?=.*[a-z])[a-z0-9_-]{3,20}$/i,
-    phone: /^(([+][(]?[0-9]{1,3}[)]?)|([(]?[0-9]{4}[)]?))\s*[)]?[-\s.]?[(]?[0-9]{1,3}[)]?([-\s.]?[0-9]{3})([-\s.]?[0-9]{3,4})$/,
+    phone: /^((8|\+7)[- ]?)?(\(?\d{3}\)?[- ]?)?[\d- ]{7,10}$/,
     name: /^[A-ZА-Я]+[a-zа-я-]*$/,
     displayname: /^[a-zа-я0-9_-\s]{1,20}$/i,
     message: /\S/,
@@ -27,10 +27,11 @@ export type InputData = {
 export class InputField {
     protected _props: InputData;
 
-    public html?: HTMLInputElement;
+    public html!: HTMLInputElement;
 
     constructor(data: InputData) {
         this._props = data;
+        this.render();
     }
 
     public render(): HTMLElement[] {
@@ -71,7 +72,7 @@ export class InputField {
         return form;
     }
 
-    private validate(input: HTMLInputElement, rule: keyof typeof rules | undefined = 'message'): boolean {
+    public validate(input: HTMLInputElement = this.html, rule: keyof typeof rules = this._props.validate || 'message'): boolean {
         const isValid = rules[rule].test(input.value);
         if (isValid) {
             input.classList.add('valid');

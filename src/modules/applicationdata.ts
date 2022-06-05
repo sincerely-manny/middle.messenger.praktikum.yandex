@@ -1,7 +1,6 @@
 // файл описывает типы данных и глобальный объект с данными
-// import { data } from './testData';
 import { User } from './user';
-import { Chat } from '../blocks/chat';
+// import { Chat } from '../blocks/chat';
 import { users } from '../models/dummy_data/users';
 import { chats } from '../models/dummy_data/chats';
 import { TE } from './templatebike';
@@ -23,7 +22,6 @@ chats.sort((a, b) => {
 type ApplicationData = {
     user: User,
     chats: any[],
-    getChat: (user_id: number) => Chat,
     runtime: { [key: string]: any },
 };
 
@@ -44,10 +42,6 @@ const applicationData: ApplicationData = {
     }),
     runtime: {},
     chats,
-    getChat: (user_id: number) => {
-        const chat = applicationData.chats?.find((e) => ((e.user_id === user_id) ? e : false));
-        return chat || {} as Chat;
-    },
 };
 
 export const appData = new Proxy(applicationData, {

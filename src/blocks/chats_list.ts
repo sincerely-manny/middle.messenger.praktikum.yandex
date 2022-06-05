@@ -59,7 +59,9 @@ export default class ChatsList extends Block {
         }
         const block = await TE.render('chats_list/chats_list', container);
         TE.render('chats_list/header', this.childById('chats-list-header', container))
-            .then(() => { ETB.trigger(AppEvent.CHATS_LIST_HEADER_IS_Rendered); });
+            .then(() => {
+                ETB.trigger(AppEvent.CHATS_LIST_HEADER_IS_Rendered);
+            });
         this.chats.forEach(async (c, i, a) => {
             const chatCollection = await TE.render('chats_list/chat', null, c);
             // eslint-disable-next-line no-param-reassign
@@ -94,7 +96,6 @@ export default class ChatsList extends Block {
     }
 
     private scrollChat() {
-        const container = document.getElementById('active-chat');
         const chatCont = document.getElementById('active-chat-messages_container');
         if (chatCont) {
             chatCont.scrollTo({ top: chatCont.scrollHeight });

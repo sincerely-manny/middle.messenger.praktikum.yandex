@@ -18,7 +18,7 @@ export default class E404 extends View {
         if (!this.err) {
             this.err = new ErrorPage(errors.e404);
         }
-        this.err.place(this.childById('conainer'));
+        this.err.place(this.childById('container'));
     }
 
     public stop(): void {

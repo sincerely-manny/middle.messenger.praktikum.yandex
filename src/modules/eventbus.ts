@@ -23,6 +23,7 @@ export enum AppEvent {
     PASSWORD_FORM_IS_Submitted,
     INPUT_Focus,
     INPUT_Blur,
+    USERDATA_Updated,
 }
 
 type Subscription = {

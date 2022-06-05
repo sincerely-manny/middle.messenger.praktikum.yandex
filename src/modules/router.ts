@@ -68,7 +68,7 @@ export class Router {
         } else if (this.e404 && this.routes[this.e404]) {
             route = this.routes[this.e404];
         } else {
-            throw new Error('No controller specified for this path');
+            throw new Error(`No controller specified for this path: ${path}`);
         }
         const pathParams: Record<string, string> = {};
         route.params?.forEach((p, i) => {

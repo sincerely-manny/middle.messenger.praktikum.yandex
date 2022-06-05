@@ -21,6 +21,10 @@ export default abstract class Block {
     }
 
     protected render(id?: string): HTMLElement {
+        if (this._element) {
+            this._element.innerHTML = '';
+            return this._element;
+        }
         const div = document.createElement('div');
         if (id) {
             div.id = id;

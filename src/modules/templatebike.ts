@@ -1,16 +1,6 @@
 /**
- * @File   : templatebike.js
- * @Author :  ()
- * @Link   :
- * @Date   : 4/17/2022, 4:53:24 PM
- */
-
-/**
  * {{$var}} => value
  * {{$arr}} {{$var}} {{/$arr}} => foreach
- *
- * let TE = new TemplateBike(data, path/to/templates);
- * TE.render(templateName, targetElem);
  */
 
 import * as importedTemplates from '../utils/importTemplates';

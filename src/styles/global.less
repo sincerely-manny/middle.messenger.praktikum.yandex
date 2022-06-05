@@ -52,6 +52,12 @@ hr {
     overflow: hidden;
     .flex-display();
     .flex-direction();
+
+    &:empty {
+        .image_as_bg('preloader.svg');
+
+        background-size: 30%;
+    }
 }
 
 input {

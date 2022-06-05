@@ -5,7 +5,9 @@ export abstract class Form {
 
     public form?: HTMLFormElement;
 
-    public inputs?: HTMLInputElement[] = [];
+    public inputs?: InputField[] = [];
+
+    public submitBtn?: HTMLInputElement;
 
     constructor(data: {}) {
         this._props = data;
@@ -18,9 +20,7 @@ export abstract class Form {
     protected createInput(data: InputData) {
         const input = new InputField(data);
         const rendered = input.render();
-        if (input.html) {
-            this.inputs?.push(input.html);
-        }
+        this.inputs?.push(input);
         return rendered;
     }
 
@@ -51,8 +51,9 @@ export abstract class Form {
     public logObject() {
         // да, уродливо, зато быстро
         this.inputs?.forEach((i) => { // триггерим валидацию всех полей при сабмите
-            i.focus();
-            i.blur();
+            // i.html?.focus();
+            // i.html?.blur();
+            i.validate();
         });
         const object: { [key: string]: FormDataEntryValue | null } = {};
         const formData = new FormData(this.form);

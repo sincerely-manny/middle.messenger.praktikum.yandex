@@ -113,5 +113,15 @@
         .small_submit();
 
         float: right;
+        margin-bottom: 30px;
+        transition: all 0.3s;
+
+        &:disabled {
+            .image_as_bg('preloader.svg');
+
+            background-size: cover;
+            background-color: fade(@black, 0%);
+            color: fade(@black, 0%);
+        }
     }
 }

@@ -1,6 +1,7 @@
 import Block from '../components/block';
 import { ModalForm, ModalFormData } from '../components/modalform';
 import { AppEvent, ETB } from '../modules/eventbus';
+import { RTR } from '../modules/router';
 
 export const formData = {
     signIn: {
@@ -8,9 +9,10 @@ export const formData = {
         message: 'Don’t have an account?',
         link: {
             text: 'Sign up',
-            href: '#signup',
-            onclick: () => {
-                ETB.trigger(AppEvent.MODAL_SignUp_IS_Called);
+            href: '/sign-up',
+            onclick: (e) => {
+                e.preventDefault();
+                RTR.go('sign-up');
             },
         },
         fields: [
@@ -38,9 +40,10 @@ export const formData = {
         message: 'Already have an account?',
         link: {
             text: 'Sign in',
-            href: '#signin',
-            onclick: () => {
-                ETB.trigger(AppEvent.MODAL_SignIn_IS_Called);
+            href: '/sign-in',
+            onclick: (e) => {
+                e.preventDefault();
+                RTR.go('sign-in');
             },
         },
         fields: [
@@ -71,7 +74,7 @@ export const formData = {
             {
                 type: 'text',
                 value: '',
-                placeholder: 'Second name',
+                placeholder: 'Last name',
                 name: 'second_name',
                 class: '',
                 validate: 'name',

@@ -23,7 +23,7 @@ class Messenger extends View {
         this._params = params;
         ETB.subcribe(AppEvent.CHATS_LIST_IS_Rendered, this.init);
         if (!this.chatsList) {
-            ETB.subcribe(AppEvent.CHATS_LIST_IS_Rendered_async, this.bindLinks);
+            ETB.subcribe(AppEvent.CHATS_LIST_HEADER_IS_Rendered, this.bindLinks);
             this.chatsList = new ChatsList();
         } else {
             ETB.trigger(AppEvent.CHATS_LIST_IS_Rendered);
@@ -33,8 +33,8 @@ class Messenger extends View {
 
     public stop() {
         ETB.unsubscribe(AppEvent.CHATS_LIST_IS_Rendered, this.init);
-        ETB.unsubscribe(AppEvent.CHATS_LIST_IS_Rendered_async, this.bindLinks);
-        if (RTR.root !== 'settings' && RTR.root === 'messenger') {
+        ETB.unsubscribe(AppEvent.CHATS_LIST_HEADER_IS_Rendered, this.bindLinks);
+        if (RTR.root !== 'settings' && RTR.root !== 'messenger') {
             this.chatsList?.unload();
         }
     }
