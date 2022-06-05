@@ -5,7 +5,7 @@ import SignUp from './sign-up';
 import SignIn from './sign-in';
 import E404 from './e404';
 import { UserinfoAPI } from '../api/userinfo';
-import { appData } from '../modules/appData';
+import { appData } from '../modules/appdata';
 
 export default async function start() {
     RTR.addRoute('sign-in', new SignIn());

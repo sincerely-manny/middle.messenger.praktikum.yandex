@@ -1,6 +1,6 @@
 import Block from '../components/block';
 import { ProfileForm, ProfileFormData } from '../components/profileform';
-import { appData } from '../modules/appData';
+import { appData } from '../modules/appdata';
 import { AppEvent, ETB } from '../modules/eventbus';
 import { TE } from '../modules/templatebike';
 
