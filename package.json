@@ -6,11 +6,11 @@
   "license": "ISC",
   "author": "",
   "scripts": {
-    "dev": "parcel static/index.html -p 3000",
-    "build": "parcel build static/index.html",
+    "dev": "parcel static/index.html -p 3000 --no-cache",
+    "build": "parcel build static/index.html --no-cache --no-optimize",
     "start": "npm run build && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "echo \"ESLINT: \" && node_modules/.bin/eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\""
+    "lint": "echo \"ESLINT: \" && npx eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\""
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "2.5.0",
@@ -66,7 +66,9 @@
       "default-case-last": "warn",
       "no-underscore-dangle": "off",
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["off"]
+      "@typescript-eslint/no-unused-vars": ["off"],
+      "no-constructor-return": "off",
+      "class-methods-use-this": ["off"]
     }
   },
   "stylelint": {

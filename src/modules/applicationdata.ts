@@ -1,11 +1,9 @@
 // файл описывает типы данных и глобальный объект с данными
-// import { data } from './testData';
 import { User } from './user';
-import { Chat } from '../components/chat';
+// import { Chat } from '../blocks/chat';
 import { users } from '../models/dummy_data/users';
 import { chats } from '../models/dummy_data/chats';
-import { Message } from '../components/message';
-import TemplateBike from './templatebike';
+import { TE } from './templatebike';
 
 // сортируем рандомно сгенерированные чаты по дате (пока так)
 chats.forEach((e) => {
@@ -23,8 +21,7 @@ chats.sort((a, b) => {
 
 type ApplicationData = {
     user: User,
-    chats: Chat[],
-    getChat: (user_id: number) => Chat,
+    chats: any[],
     runtime: { [key: string]: any },
 };
 
@@ -44,20 +41,8 @@ const applicationData: ApplicationData = {
         },
     }),
     runtime: {},
-    chats: [],
-    getChat: (user_id: number) => {
-        const chat = applicationData.chats?.find((e) => ((e.user_id === user_id) ? e : false));
-        return chat || {} as Chat;
-    },
+    chats,
 };
-
-applicationData.chats = chats.map(
-    (e) => new Chat(
-        e.user_id,
-        e.messages as Message[],
-        applicationData.user,
-    ),
-);
 
 export const appData = new Proxy(applicationData, {
     get(target, key) {
@@ -68,6 +53,6 @@ export const appData = new Proxy(applicationData, {
     },
 });
 
-TemplateBike.getInstance(appData);
+TE.data = appData;
 
 export default { appData };

@@ -6,3 +6,5 @@
 *-lock.json
 .cache
 .parcel-cache
+.vscode
+/local-legacy
