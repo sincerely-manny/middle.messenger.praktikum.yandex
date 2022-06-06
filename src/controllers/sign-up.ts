@@ -1,8 +1,10 @@
 import { SignupAPI, SignupUserData } from '../api/signup';
+import { UserinfoAPI } from '../api/userinfo';
 import { SignInUpForm, formData } from '../blocks/signinup';
 import { ModalForm } from '../components/modalform';
 import { InappNotification, InappNotificationStatus } from '../components/notification';
 import { View } from '../components/view';
+import { appData } from '../modules/appdata';
 import { AppEvent, ETB } from '../modules/eventbus';
 import { RTR } from '../modules/router';
 
@@ -19,12 +21,21 @@ export default class SignUp extends View {
         SignUp.instance = this;
     }
 
-    public start(_params?: Record<string, string> | undefined): void {
+    public async start(_params?: Record<string, string> | undefined): Promise<void> {
+        const userinfoAPI = new UserinfoAPI();
+        const userinfo = await userinfoAPI.isLoggedIn();
+        if (userinfo) {
+            appData.user = userinfo;
+            RTR.go('messenger');
+            return;
+        }
+
         if (!this.form) {
             this.form = new SignInUpForm(formData.signUp);
         }
-        this.form.place(this.childById('container'));
+        this.childById('container').innerHTML = '';
         this.childById('chats-list', this.childById('container'));
+        this.form.place(this.childById('modal-form-container', this.childById('container')));
         ETB.subcribe(AppEvent.MODAL_FORM_IS_Submitted, this.onSubmit);
     }
 
