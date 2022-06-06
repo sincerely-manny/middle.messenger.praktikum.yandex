@@ -45,18 +45,28 @@ export class Router {
         return this;
     }
 
-    private parsePath(path: string) {
+    private getParams(path: string) {
         const pathArr = path.split('/');
-        if (pathArr[1] === '') {
+        return {
+            root: pathArr[1],
+            params: pathArr.slice(2),
+        };
+    }
+
+    private parsePath(path: string) {
+        const pathObj = this.getParams(path);
+        let { root } = pathObj;
+        const { params } = pathObj;
+        if (root === '') {
             if (this.default) {
-                pathArr[1] = this.default;
+                root = this.default;
             } else {
                 throw new Error('No default controller specified');
             }
         }
         return {
-            root: pathArr[1],
-            params: pathArr.slice(2),
+            root,
+            params,
         };
     }
 
