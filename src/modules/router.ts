@@ -26,7 +26,7 @@ export class Router {
         window.onpopstate = () => {
             this.run(window.location.pathname);
         };
-        this._root = this.parsePath(window.location.pathname).root;
+        this._root = this.getParams(window.location.pathname).root;
         Router.instance = this;
     }
 
