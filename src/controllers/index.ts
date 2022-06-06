@@ -21,6 +21,8 @@ export default async function start() {
     if (userinfo) {
         appData.user = userinfo;
         RTR.start();
+    } else if (RTR.root === 'sign-in' || RTR.root === 'sign-up') {
+        RTR.start();
     } else {
         RTR.go('sign-in');
     }
