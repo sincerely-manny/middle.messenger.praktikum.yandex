@@ -91,9 +91,6 @@ export class Chat extends Block implements IChat {
         const activeChat = TE.render('chat/active_chat', this._element, this);
         this.messagesContainer = (await activeChat)[0].querySelector('#active-chat-messages') as HTMLElement;
         const newMsgContainer = (await activeChat)[0].querySelector('#active-chat-new-message') as HTMLElement;
-        // this.renderMessages().then(() => {
-        //     ETB.trigger(AppEvent.CHAT_IS_Rendered, this);
-        // });
         TE.render('chat/new_message_form', newMsgContainer).then(() => {
             ETB.trigger(AppEvent.CHAT_NEWMESSAGE_FORM_IS_Rendered, this);
         });
@@ -104,6 +101,9 @@ export class Chat extends Block implements IChat {
     public async renderChatListItem() {
         const [html] = await TE.render('chats_list/chat', null, this);
         if (this.listHtmlElement) {
+            this.listHtmlElement.className.split(' ').forEach((c) => {
+                html.classList.add(c);
+            });
             this.listHtmlElement.replaceWith(html);
         }
         this.listHtmlElement = html;
