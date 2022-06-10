@@ -1,99 +1,80 @@
-import { Message } from '../components/message';
+import { IMessage, Message } from '../components/message';
 import { User } from '../modules/user';
-import { users } from '../models/dummy_data/users';
-import { chats } from '../models/dummy_data/chats';
 import { TE } from '../modules/templatebike';
-import weekday from '../utils/weekdays';
 import Block from '../components/block';
 import { AppEvent, ETB } from '../modules/eventbus';
+import { MessagesAPI } from '../api/messages';
+import { UsersAPI } from '../api/users';
+import { appData } from '../modules/appdata';
 
 export interface IChat {
-    user_id: number,
-    messages: Message[],
+    id: number,
+    title: string,
+    avatar: string,
+    unread_count: number,
+    last_message: Message,
+    messages?: Message[],
 }
 
 export class Chat extends Block implements IChat {
-    public user_id: number;
+    public id!: number;
 
-    private _messages: Message[];
+    public title!: string;
 
-    public last_message: {
-        unread: number,
-        preview: string | null,
-        time: string,
-    };
+    public avatar!: string;
 
-    public user: User;
+    public unread_count!: number;
 
-    private me: User;
+    private _last_message!: Message;
 
-    public listHtmlElement: HTMLElement | undefined;
+    public messages: Message[] = [];
 
-    constructor(
-        props: { user_id: number, messages: Message[], me: User },
-    ) {
-        super(props);
-        this.user_id = props.user_id;
-        this.me = props.me;
-        if (props.messages.length === 0) {
-            this._messages = this.fetchMessages();
-        } else {
-            this._messages = props.messages;
+    private messagesContainer?: HTMLElement;
+
+    public api: MessagesAPI;
+
+    public listHtmlElement?: HTMLElement;
+
+    private users!: Promise<User[]>;
+
+    private scrollHeight?: number;
+
+    constructor(data: IChat) {
+        super(data);
+        Object.assign(this, data);
+        this.getChatUsers();
+        this.last_message = new Message(this.last_message);
+        if (this.last_message.content.length > 90) {
+            this.last_message.content = `${[...this.last_message.content].slice(0, 90).join('').trim()}...`;
         }
-        this._messages = this._messages.map((m) => new Message(m));
-        let preview = this._messages[this._messages.length - 1].text;
-        if (preview && preview.length > 90) {
-            preview = `${[...preview].slice(0, 90).join('').trim()}...`;
-        }
-        const unread = this._messages.filter((m) => (m.user_id !== this.me.id && m.status === 'unread')).length;
-        let time;
-        const { timestamp } = this._messages[this.messages.length - 1];
-        const dateObj = new Date(timestamp);
-        if ((Date.now() - timestamp) < (60 * 60 * 24 * 5 * 1000)) {
-            time = weekday.short[dateObj.getDay()];
-        } else {
-            time = `${(`0${dateObj.getDate()}`).slice(-2)}.${(`0${dateObj.getMonth() + 1}`).slice(-2)}`;
-        }
-        this.last_message = {
-            unread,
-            preview,
-            time,
-        };
-        const user = users.find((e) => {
-            if (e.id === this.user_id) {
-                return e;
-            }
-            return false;
-        });
-        if (user === undefined) {
-            this.user = {} as User;
-        } else {
-            this.user = user;
-        }
+        this.catchMessages = this.catchMessages.bind(this);
+        this.api = new MessagesAPI(this.catchMessages);
+        this.connect();
+        this.scrollTopListener = this.scrollTopListener.bind(this);
+        this.scrollToTheEnd = this.scrollToTheEnd.bind(this);
+        this.loadPreviousMessages = this.loadPreviousMessages.bind(this);
+        this.initLoadMessages = this.initLoadMessages.bind(this);
+        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.scrollToTheEnd);
+        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.scrollTopListener);
+        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.initLoadMessages);
     }
 
-    public get messages() {
-        return this._messages;
+    public get last_message(): Message {
+        return this._last_message;
     }
 
-    public set messages(_messages) {
-        throw new Error('access denied');
+    public set last_message(data: Message) {
+        this._last_message = data;
+        this.renderChatListItem();
     }
 
-    public fetchMessages() {
-        const chat = chats.find((e) => {
-            if (e.user_id === this.user_id) {
-                return e;
-            }
-            return false;
-        });
-        let messages: Message[];
-        if (chat === undefined) {
-            messages = [] as Message[];
-        } else {
-            messages = chat.messages as Message[];
-        }
-        return messages;
+    public async connect() {
+        await this.api.connect(this.id, appData.user);
+        ETB.trigger(AppEvent.CHAT_TOKEN_Recieved, this);
+    }
+
+    public disconnect() {
+        this.api.disconnect();
     }
 
     public render() {
@@ -108,49 +89,211 @@ export class Chat extends Block implements IChat {
             return [this._element];
         }
         const activeChat = TE.render('chat/active_chat', this._element, this);
-        const msgContainer = (await activeChat)[0].querySelector('#active-chat-messages') as HTMLElement;
+        this.messagesContainer = (await activeChat)[0].querySelector('#active-chat-messages') as HTMLElement;
         const newMsgContainer = (await activeChat)[0].querySelector('#active-chat-new-message') as HTMLElement;
-        this.renderMessages(this, msgContainer).then(() => {
-            ETB.trigger(AppEvent.CHAT_IS_Rendered, this);
+        // this.renderMessages().then(() => {
+        //     ETB.trigger(AppEvent.CHAT_IS_Rendered, this);
+        // });
+        TE.render('chat/new_message_form', newMsgContainer).then(() => {
+            ETB.trigger(AppEvent.CHAT_NEWMESSAGE_FORM_IS_Rendered, this);
         });
-        TE.render('chat/new_message_form', newMsgContainer);
         [this._element] = (await activeChat);
         return activeChat;
     }
 
-    private async renderMessages(chat: Chat, msgContainer: HTMLElement | null) {
+    public async renderChatListItem() {
+        const [html] = await TE.render('chats_list/chat', null, this);
+        if (this.listHtmlElement) {
+            this.listHtmlElement.replaceWith(html);
+        }
+        this.listHtmlElement = html;
+        this.listHtmlElement.addEventListener('click', (e) => {
+            if (!(e.target as HTMLElement).classList.contains('active')) {
+                ETB.trigger(AppEvent.CHAT_LI_IS_Clicked, this);
+            }
+        });
+        return this.listHtmlElement;
+    }
+
+    private async renderMessages(messages: Message[]) {
         let sender = {} as User;
         let currShownDate: string | undefined;
+        let rendered: HTMLElement[] = [];
+        let insertFn: Function;
+        const appendTo = TE.appendTo.bind(TE);
+        const prependTo = TE.prependTo.bind(TE);
 
-        // eslint-disable-next-line no-restricted-syntax
-        for (const message of chat.messages) {
-            let newDate = false;
-            if (currShownDate !== message.date) {
-                currShownDate = message.date;
-                newDate = true;
-                await TE.render('messages/date', msgContainer, message);
-            }
-            if (sender.id !== message.user_id || newDate) {
-                if (message.user_id === this.me.id) {
-                    sender = this.me;
-                } else if (message.user_id === chat.user_id) {
-                    sender = chat.user;
+        await this.users; // подождем, пока в appData приедут пользователи
+        if (this.messages.length !== 0) {
+            const firstRenderedMessage = this.messages[0];
+            const lastRenderedMessage = this.messages[this.messages.length - 1];
+            const firstRecievedMessage = messages[0];
+            const lastRecievedMessage = messages[messages.length - 1];
+            if (
+                new Date(lastRenderedMessage.time) <= new Date(firstRecievedMessage.time)
+            ) { // пришли сообщения новее
+                insertFn = appendTo;
+                sender = appData.users[+lastRenderedMessage.user_id];
+                currShownDate = lastRenderedMessage.datePretty;
+            } else { // пришли более старые сообщения
+                insertFn = prependTo;
+                if (firstRenderedMessage.datePretty === lastRecievedMessage.datePretty) {
+                    this.messagesContainer?.querySelector('.date-separator')?.remove();
+                    if (+firstRenderedMessage.user_id === +lastRecievedMessage.user_id) {
+                        this.messagesContainer?.querySelector('.sender')?.remove();
+                    }
                 }
-                await TE.render('messages/sender', msgContainer, sender);
             }
-            if (message.img_attachment !== undefined) {
-                [message.htmlElement] = await TE.render('messages/message_img', msgContainer, message);
-            } else {
-                [message.htmlElement] = await TE.render('messages/message', msgContainer, message);
-            }
+        } else {
+            insertFn = appendTo;
         }
-        return msgContainer;
+
+        const newMessages: Message[] = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const message of messages) {
+            let newDate = false;
+            if (currShownDate !== message.datePretty) {
+                currShownDate = message.datePretty;
+                newDate = true;
+                rendered = rendered.concat(await TE.render('messages/date', null, message));
+            }
+            if (sender.id !== +message.user_id || newDate) {
+                sender = appData.users[+message.user_id];
+                if (!sender.display_name) {
+                    sender.display_name = `${sender.first_name} ${sender.second_name}`;
+                }
+                rendered = rendered.concat(await TE.render('messages/sender', null, sender));
+            }
+            if (message.file) {
+                [message.htmlElement] = await TE.render('messages/message_img', null, message);
+            } else {
+                [message.htmlElement] = await TE.render('messages/message', null, message);
+            }
+            rendered.push(message.htmlElement);
+            newMessages.push(message);
+        }
+        if (insertFn === appendTo) {
+            this.messages = this.messages.concat(newMessages);
+            ETB.trigger(AppEvent.CHAT_NEW_MESSAGES_Appended, this);
+        } else {
+            this.messages = newMessages.concat(this.messages);
+            ETB.trigger(AppEvent.CHAT_NEW_MESSAGES_Prepended, this);
+        }
+        if (this.messagesContainer) {
+            this.setScrollParams();
+            insertFn(this.messagesContainer, rendered);
+        }
+        if (insertFn === prependTo) {
+            this.preserveScroll();
+        } else {
+            this.scrollToTheEnd(this);
+        }
+        this.last_message = this.messages[this.messages.length - 1];
+        ETB.trigger(AppEvent.CHAT_IS_Rendered, this);
+        return this.messagesContainer;
     }
 
     public async place(parent: HTMLElement) {
+        if (this.messages.length === 0) {
+            this.requestMessages(0);
+        }
         await super.place(parent);
         ETB.trigger(AppEvent.CHAT_IS_Placed, this);
         return this._element;
+    }
+
+    public send(text: string) {
+        this.api.sendMessage(text);
+    }
+
+    private requestMessages(offset: number) {
+        this._element.classList.add('loading');
+        this.api.requestMessages(offset);
+    }
+
+    private catchMessages(data: IMessage | IMessage[]) {
+        let recievedMessages: IMessage[];
+        if (!Array.isArray(data)) {
+            recievedMessages = [data];
+        } else {
+            recievedMessages = data;
+        }
+        if (recievedMessages[0].type !== 'pong') {
+            this._element.classList.remove('loading');
+        } else {
+            return;
+        }
+        const messages = recievedMessages
+            .filter((m) => m.type === 'message')
+            .map((m) => new Message(m))
+            .reverse();
+        if (messages.length < 20) {
+            ETB.unsubscribe(AppEvent.CHAT_IS_Rendered, this.scrollTopListener);
+            ETB.unsubscribe(AppEvent.CHAT_IS_Rendered, this.initLoadMessages);
+        }
+        if (messages.length !== 0) {
+            this.renderMessages(messages);
+        }
+    }
+
+    private async getChatUsers() {
+        const api = new UsersAPI();
+        this.users = api.getUsersByChat(this.id);
+        appData.setUser(await this.users);
+    }
+
+    private scrollTopListener(c: Chat) {
+        if (c !== this) {
+            return;
+        }
+        const chatCont = this._element.querySelector('#active-chat-messages_container');
+        chatCont?.addEventListener('scroll', this.loadPreviousMessages, { passive: true });
+    }
+
+    private loadPreviousMessages() {
+        const chatCont = this._element.querySelector('#active-chat-messages_container');
+        if (chatCont?.scrollTop === 0) {
+            this.requestMessages(this.messages.length);
+            chatCont.removeEventListener('scroll', this.loadPreviousMessages);
+        }
+    }
+
+    private initLoadMessages() {
+        const chatCont = this._element.querySelector('#active-chat-messages_container');
+        if (chatCont && (chatCont?.scrollHeight <= chatCont?.clientHeight)) {
+            this.loadPreviousMessages();
+        }
+    }
+
+    private scrollToTheEnd(c: Chat) {
+        if (c !== this) {
+            return;
+        }
+        ETB.unsubscribe(AppEvent.CHAT_IS_Rendered, this.scrollToTheEnd);
+        const chatCont = this._element.querySelector('#active-chat-messages_container');
+        if (chatCont) {
+            chatCont.scrollTo({ top: chatCont.scrollHeight });
+        }
+    }
+
+    private setScrollParams() {
+        const chatCont = this._element.querySelector('#active-chat-messages_container');
+        if (chatCont) {
+            this.scrollHeight = chatCont.scrollHeight;
+        }
+    }
+
+    private preserveScroll() {
+        const chatCont = this._element.querySelector('#active-chat-messages_container');
+        if (chatCont && this.scrollHeight) {
+            if (chatCont.scrollHeight > this.scrollHeight) {
+                const delta = chatCont.scrollHeight - this.scrollHeight;
+                chatCont.scrollTo({
+                    top: (chatCont.scrollTop + (delta / 2)),
+                });
+            }
+        }
+        this.setScrollParams();
     }
 }
 

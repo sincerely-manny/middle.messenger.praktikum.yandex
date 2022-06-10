@@ -1,3 +1,5 @@
+import { ChatsAPI } from '../api/chats';
+import { Chat } from '../blocks/chat';
 import ChatsList from '../blocks/chats_list';
 import { View } from '../components/view';
 import { AppEvent, ETB } from '../modules/eventbus';
@@ -24,7 +26,12 @@ class Messenger extends View {
         ETB.subcribe(AppEvent.CHATS_LIST_IS_Rendered, this.init);
         if (!this.chatsList) {
             ETB.subcribe(AppEvent.CHATS_LIST_HEADER_IS_Rendered, this.bindLinks);
-            this.chatsList = new ChatsList();
+            ETB.subcribe(AppEvent.CHAT_NEWMESSAGE_FORM_IS_Rendered, this.bindNewMessageActions);
+
+            const api = new ChatsAPI();
+            api.request().then((c) => {
+                this.chatsList = new ChatsList(c);
+            });
         } else {
             ETB.trigger(AppEvent.CHATS_LIST_IS_Rendered);
             ETB.trigger(AppEvent.CHATS_LIST_HEADER_IS_Rendered);
@@ -54,6 +61,16 @@ class Messenger extends View {
         document.querySelector('#chats-list-header .profile-link')?.addEventListener('click', (e) => {
             e.preventDefault();
             RTR.go('settings');
+        });
+    }
+
+    private bindNewMessageActions(chat: Chat) {
+        const form = chat.element.querySelector('form[name=new_message]') as HTMLFormElement;
+        form?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const values = new FormData(form);
+            chat.send(values.get('message') as string);
+            form.reset();
         });
     }
 }

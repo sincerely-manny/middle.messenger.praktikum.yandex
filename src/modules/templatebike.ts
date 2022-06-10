@@ -175,7 +175,7 @@ export class TemplateBike {
             return defaultValue;
         }
         if (Array.isArray(value) || value instanceof HTMLElement) return value;
-        return value.toString() ?? defaultValue;
+        return value?.toString() ?? defaultValue;
     }
 
     private async fetchTemplate(templateName: string) {

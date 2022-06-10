@@ -1,3 +1,4 @@
+import { IChat } from '../blocks/chat';
 import { BaseAPI } from './base';
 
 export class ChatsAPI extends BaseAPI {
@@ -9,7 +10,8 @@ export class ChatsAPI extends BaseAPI {
                 'content-type': 'application/json',
             },
         });
-        let chatslistResponse;
+        const chatslistResponse: IChat[] = JSON.parse(response.responseText);
+        return chatslistResponse;
     }
 }
 

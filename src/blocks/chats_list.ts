@@ -1,7 +1,5 @@
 import Block from '../components/block';
-import { Chat } from './chat';
-import { Message } from '../components/message';
-import { appData } from '../modules/applicationdata';
+import { Chat, IChat } from './chat';
 import { AppEvent, ETB } from '../modules/eventbus';
 import { RTR } from '../modules/router';
 import { TE } from '../modules/templatebike';
@@ -9,30 +7,18 @@ import { TE } from '../modules/templatebike';
 export default class ChatsList extends Block {
     public activeChat?: Chat;
 
-    public chats!: Chat[];
+    public chats: Chat[] = [];
 
     private static instance:ChatsList;
 
-    constructor() {
+    constructor(data: Chat[]) {
         if (ChatsList.instance) {
             return ChatsList.instance;
         }
-        super(appData);
-        this.chats = appData.chats.map(
-            (e) => new Chat(
-                {
-                    user_id: e.user_id,
-                    messages: e.messages as Message[],
-                    me: appData.user,
-                },
-            ),
-        );
-
-        ETB.subcribe(AppEvent.CHAT_LI_IS_Clicked, (c: Chat) => { RTR.go(`messenger/${c.user_id}`); });
-        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.scrollChat);
+        super(data);
+        ETB.subcribe(AppEvent.CHAT_LI_IS_Clicked, (c: Chat) => { RTR.go(`messenger/${c.id}`); });
         ETB.subcribe(AppEvent.CHATS_LIST_IS_Rendered_async, this.markActive);
         ETB.subcribe(AppEvent.CHAT_IS_Placed, this.markActive);
-        ETB.subcribe(AppEvent.CHAT_IS_Placed, this.scrollChat);
         ETB.subcribe(AppEvent.KEY_PRESSED_Escape, () => {
             if (this.activeChat) {
                 RTR.go('messenger');
@@ -62,16 +48,11 @@ export default class ChatsList extends Block {
             .then(() => {
                 ETB.trigger(AppEvent.CHATS_LIST_HEADER_IS_Rendered);
             });
-        this.chats.forEach(async (c, i, a) => {
-            const chatCollection = await TE.render('chats_list/chat', null, c);
-            // eslint-disable-next-line no-param-reassign
-            [c.listHtmlElement] = chatCollection;
-            c.listHtmlElement.addEventListener('click', (e) => {
-                if (!(e.target as HTMLElement).classList.contains('active')) {
-                    ETB.trigger(AppEvent.CHAT_LI_IS_Clicked, c);
-                }
-            });
-            TE.appendTo(document.getElementById('chats'), chatCollection);
+        this._props.forEach(async (c: IChat, i: number, a: IChat[]) => {
+            const chat = new Chat(c);
+            this.chats?.push(chat);
+            const html = await chat.renderChatListItem();
+            TE.appendTo(document.getElementById('chats'), [html]);
             if (i === (a.length - 1)) {
                 ETB.trigger(AppEvent.CHATS_LIST_IS_Rendered_async, this.activeChat);
             }
@@ -90,16 +71,9 @@ export default class ChatsList extends Block {
         if (c.listHtmlElement) {
             c.listHtmlElement.classList.add('active');
         } else {
-            document.getElementById(`chats-list-element-${c.user_id}`)?.classList.add('active');
+            document.getElementById(`chats-list-element-${c.id}`)?.classList.add('active');
         }
         return true;
-    }
-
-    private scrollChat() {
-        const chatCont = document.getElementById('active-chat-messages_container');
-        if (chatCont) {
-            chatCont.scrollTo({ top: chatCont.scrollHeight });
-        }
     }
 
     public closeActiveChat() {
@@ -135,10 +109,10 @@ export default class ChatsList extends Block {
         this.markActive(this.activeChat);
     }
 
-    public getChat(user_id: number): Chat {
-        const chat = this.chats?.find((e) => ((e.user_id === user_id) ? e : false));
+    public getChat(id: number): Chat {
+        const chat = this.chats?.find((e) => ((e.id === id) ? e : false));
         if (!chat) {
-            throw new Error(`Chat #${user_id} not found`);
+            throw new Error(`Chat #${id} not found`);
         }
         return chat;
     }

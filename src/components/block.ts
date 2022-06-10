@@ -52,14 +52,6 @@ export default abstract class Block {
         return tempDiv;
     }
 
-    public show() {
-        this._element.style.display = '';
-    }
-
-    public hide() {
-        this._element.style.display = 'none';
-    }
-
     protected childById(id: string, parent: HTMLElement = document.body): HTMLElement {
         let elem = parent.querySelector(`#${id}`);
         if (!elem) {

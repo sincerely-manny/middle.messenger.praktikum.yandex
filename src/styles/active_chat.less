@@ -25,9 +25,30 @@
 
 .active-chat-container,
 #active-chat-container {
+    position: relative;
     .flex-display();
     .flex-direction(column);
     .justify-content(space-between);
+
+    width: 100%;
+
+    &.loading {
+        &::before {
+            display: block;
+            content: ' ';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            .image_as_bg('preloader.svg');
+
+            width: 200px;
+            height: 25px;
+            margin-left: -100px;
+            background-color: fade(@black, 50%);
+            border-radius: 25px;
+            outline: 10px solid fade(@black, 50%);
+        }
+    }
 
     .active-chat-messages-container {
         padding: 0 3em;
@@ -37,6 +58,8 @@
 }
 
 .date-separator {
+    .fadein-animation();
+
     display: block;
     border-top: 1px solid @green;
     border-bottom: 1px solid @green;
@@ -52,6 +75,8 @@
     margin-bottom: 2.2em;
 
     .sender {
+        .fadein-animation();
+
         margin: 1.5em 0 0.5em;
 
         *> {
@@ -73,6 +98,8 @@
     }
 
     .message-body {
+        .fadein-animation();
+
         position: relative;
 
         .text {
@@ -131,6 +158,8 @@
     }
 
     .message-img {
+        .fadein-animation();
+
         img {
             margin: 1em 0 0;
             height: 300px;

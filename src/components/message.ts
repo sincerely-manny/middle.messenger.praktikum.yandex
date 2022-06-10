@@ -1,36 +1,64 @@
-export interface IMessage {
+import twoDigit from '../utils/twodigit';
+import weekday from '../utils/weekdays';
+
+export interface IFileAttachment {
     id: number,
     user_id: number,
-    text: string | null,
-    img_attachment?: string | null,
-    timestamp: number,
-    status: 'sent' | 'delivered' | 'unread' | 'read',
+    path: string,
+    filename: string,
+    content_type: string,
+    content_size: number,
+    upload_date: string,
+}
+
+export interface IMessage {
+    id: number,
+    chat_id: number,
+    time: string,
+    type: string,
+    user_id: string,
+    content: string,
+    file?: IFileAttachment,
 }
 
 export class Message implements IMessage {
     id!: number;
 
-    user_id!: number;
+    chat_id!: number;
 
-    text!: string | null;
+    time!: string;
 
-    img_attachment?: string | null | undefined;
+    type!: string;
 
-    timestamp!: number;
+    user_id!: string;
 
-    status!: 'sent' | 'delivered' | 'unread' | 'read';
+    content!: string;
 
-    date: string;
+    file?: IFileAttachment | undefined;
 
-    time: string;
+    status?: 'sent' | 'delivered' | 'unread' | 'read';
 
-    htmlElement: HTMLElement | undefined;
+    htmlElement?: HTMLElement;
 
-    constructor(_message: IMessage) {
-        Object.assign(this, _message);
-        const date = new Date(this.timestamp);
-        this.date = date.toLocaleDateString();
-        this.time = date.toLocaleTimeString('ru-RU').slice(0, -3);
+    datePretty: string;
+
+    timePretty: string;
+
+    dateTimePretty: string;
+
+    constructor(message: IMessage) {
+        Object.assign(this, message);
+        const date = new Date(this.time);
+        this.datePretty = date.toLocaleDateString();
+        this.timePretty = date.toLocaleTimeString('ru-RU').slice(0, -3);
+        const msAgo = Date.now() - date.getTime();
+        if (msAgo < (60 * 60 * 23 * 1000)) {
+            this.dateTimePretty = `${twoDigit(date.getHours())}:${twoDigit(date.getMinutes())}`;
+        } else if (msAgo < (60 * 60 * 24 * 5 * 1000)) {
+            this.dateTimePretty = weekday.short[date.getDay()];
+        } else {
+            this.dateTimePretty = `${twoDigit(date.getDate())}.${twoDigit(date.getMonth() + 1)}`;
+        }
     }
 }
 
