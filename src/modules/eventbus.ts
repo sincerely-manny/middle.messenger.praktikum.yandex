@@ -3,6 +3,7 @@ export enum AppEvent {
     CHATS_LIST_IS_Rendered_async,
     CHATS_LIST_HEADER_IS_Rendered,
     CHATS_LIST_IS_Placed,
+    CHATS_LIST_IS_Updated,
     CHAT_LI_IS_Clicked,
     CHAT_IS_Rendered,
     CHAT_NEW_MESSAGES_Prepended,
@@ -29,6 +30,10 @@ export enum AppEvent {
     CHAT_TOKEN_Recieved,
     CHAT_NEWMESSAGE_FORM_IS_Rendered,
     SOCKET_MESSAGE_Recieved,
+    USERS_SEARCH_Started,
+    USERS_SEARCH_Finished,
+    USERS_SEARCH_ToBeClosed,
+    USERS_SEARCH_Placed,
 }
 
 type Subscription = {

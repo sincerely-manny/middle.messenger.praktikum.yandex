@@ -1,11 +1,11 @@
-import { User } from '../modules/user';
+import { IUser, User } from '../modules/user';
 import { BaseAPI } from './base';
 
 export type UserinfoResponse = User & {
     reason?: string,
 };
 
-export type UpdateUserData = Pick<User, 'first_name' | 'second_name' | 'login' | 'display_name' | 'email' | 'phone'>;
+export type UpdateUserData = Pick<IUser, 'first_name' | 'second_name' | 'login' | 'display_name' | 'email' | 'phone'>;
 
 export type UpdatePasswordData = {
     oldPassword: string,
@@ -26,6 +26,9 @@ export class UserinfoAPI extends BaseAPI {
             },
         });
         const responseObj: UserinfoResponse = JSON.parse(response.responseText);
+        if (!responseObj.reason) {
+            return new User(responseObj);
+        }
         return responseObj;
     }
 
@@ -39,6 +42,9 @@ export class UserinfoAPI extends BaseAPI {
             data,
         });
         const updateResponse: UserinfoResponse = JSON.parse(response.responseText);
+        if (!updateResponse.reason) {
+            return new User(updateResponse);
+        }
         return updateResponse;
     }
 
@@ -60,9 +66,7 @@ export class UserinfoAPI extends BaseAPI {
         return updatePasswordResponse;
     }
 
-    public async updateAvatar(
-        data: FormData,
-    ): Promise<UserinfoResponse> {
+    public async updateAvatar(data: FormData): Promise<UserinfoResponse> {
         const url = `${this.baseURL}/user/profile/avatar`;
         const response = await this.http.put(url, {
             credentials: true,
@@ -71,6 +75,7 @@ export class UserinfoAPI extends BaseAPI {
         let responseObj: UserinfoResponse;
         try {
             responseObj = JSON.parse(response.responseText);
+            return new User(responseObj);
         } catch {
             return {
                 reason: response.responseText as string,

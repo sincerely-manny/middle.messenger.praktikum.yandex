@@ -30,7 +30,10 @@ class Messenger extends View {
 
             const api = new ChatsAPI();
             api.request().then((c) => {
-                this.chatsList = new ChatsList(c);
+                this.chatsList = new ChatsList([]);
+                c.forEach((v) => {
+                    this.chatsList?.chats.push(new Chat(v));
+                });
             });
         } else {
             ETB.trigger(AppEvent.CHATS_LIST_IS_Rendered);
@@ -58,6 +61,7 @@ class Messenger extends View {
     }
 
     private bindLinks() {
+        // debugger;
         document.querySelector('#chats-list-header .profile-link')?.addEventListener('click', (e) => {
             e.preventDefault();
             RTR.go('settings');

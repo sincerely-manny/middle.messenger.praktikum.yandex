@@ -1,0 +1,9 @@
+<ul class="user-search-results">
+    {{$users}}
+    <li class="found-user" data-id="{{$id}}">
+    <img src="https://ya-praktikum.tech/api/v2/resources{{$avatar}}" alt="{{$display_name_shown}}">
+    <p class="display-name">{{$display_name_shown}}</p>
+    <p class="login">@{{$login}}</p>
+    </li>
+    {{/$users}}
+</ul>

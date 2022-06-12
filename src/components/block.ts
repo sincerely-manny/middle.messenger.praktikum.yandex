@@ -33,10 +33,10 @@ export default abstract class Block {
     }
 
     public async place(parent: HTMLElement) {
+        if (this._isRendered instanceof Promise) {
+            await this._isRendered;
+        }
         if (!this._isPlaced) {
-            if (this._isRendered instanceof Promise) {
-                await this._isRendered;
-            }
             this.moveChildren(this._element, parent);
             this._element = parent;
             this._isPlaced = true;

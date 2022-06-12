@@ -13,3 +13,22 @@
 .fadein-animation() {
     animation: fadein 0.75s forwards;
 }
+
+@keyframes zoomin-vertical {
+    0% {
+        // transform: scaleY(0);
+        // transform-origin: 0% 0%;
+        flex-basis: 0;
+        opacity: 0;
+        filter: blur(5);
+        margin: 0;
+    }
+
+    100% {
+        transform: scaleY(1);
+    }
+}
+
+.zoomin-vertical-animation() {
+    animation: zoomin-vertical 0.5s forwards;
+}

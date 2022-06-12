@@ -7,11 +7,7 @@ class AppData {
 
     private _user?: User;
 
-    // private _chats?: Chat[];
-
     private _users: Record<number, User> = {};
-
-    // private _runtime: Record<string, any> = {};
 
     constructor() {
         if (AppData.instance) {
@@ -35,17 +31,6 @@ class AppData {
     public deleteUser() {
         this._user = undefined;
     }
-
-    // get chats() {
-    //     if (this._chats) {
-    //         return this._chats;
-    //     }
-    //     throw new Error('No chats were fetched');
-    // }
-
-    // set chats(data: Chat[]) {
-    //     this._chats = data;
-    // }
 
     get users() {
         return this._users;

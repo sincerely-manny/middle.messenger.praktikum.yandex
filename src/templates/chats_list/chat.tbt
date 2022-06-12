@@ -1,4 +1,4 @@
-<section id="chats-list-element-{{$id}}" href="/messenger/{{$id}}" class="chat" data-unread="{{$unread_count}}" data-active="{{$active}}">
+<section id="chats-list-element-{{$id}}" href="/messenger/{{$id}}" class="chat" data-unread="{{$unread_count}}" style="--timestamp: {{$unixTimestamp}}">
     <div class="avatar"><img src="https://ya-praktikum.tech/api/v2/resources{{$avatar}}" alt="{{$title}}"></div>
     <div class="preview">
         <p class="username">{{$title}}</p>
@@ -6,6 +6,6 @@
     </div>
     <div class="info">
         <time class="last-message-time">{{$last_message.dateTimePretty}}</time>
-        <div class="unread-count" data-unread="{{unread_count}}">{{$unread_count}}</div>
+        <div class="unread-count" data-unread="{{$unread_count}}">{{$unread_count}}</div>
     </div>
 </section>

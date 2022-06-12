@@ -1,4 +1,4 @@
-import { User } from '../modules/user';
+import { User, IUser } from '../modules/user';
 import { BaseAPI } from './base';
 
 export class UsersAPI extends BaseAPI {
@@ -10,7 +10,7 @@ export class UsersAPI extends BaseAPI {
                 'content-type': 'application/json',
             },
         });
-        return JSON.parse(response.responseText);
+        return new User(JSON.parse(response.responseText));
     }
 
     public async searchUserByLogin(login: string): Promise<User[]> {
@@ -24,7 +24,7 @@ export class UsersAPI extends BaseAPI {
                 login,
             },
         });
-        return JSON.parse(response.responseText);
+        return JSON.parse(response.responseText).map((u: IUser) => new User(u));
     }
 
     public async getUsersByChat(id: number): Promise<User[]> {
@@ -35,7 +35,7 @@ export class UsersAPI extends BaseAPI {
                 'content-type': 'application/json',
             },
         });
-        return JSON.parse(response.responseText);
+        return JSON.parse(response.responseText).map((u: IUser) => new User(u));
     }
 }
 

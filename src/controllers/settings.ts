@@ -7,7 +7,7 @@ import { AppEvent, ETB } from '../modules/eventbus';
 import { RTR } from '../modules/router';
 import Messenger from './messenger';
 import { UpdatePasswordData, UpdateUserData, UserinfoAPI } from '../api/userinfo';
-import { dummyAvatarBase64 } from '../utils/dummyavatar';
+import { replaceOnError } from '../utils/dummyavatar';
 
 export default class Settings extends View {
     private static instance:Settings;
@@ -82,11 +82,7 @@ export default class Settings extends View {
         this.profile?.element.querySelector('#avatar_input')?.addEventListener('change', () => {
             this.updateAvatar();
         });
-        this.profile?.element.querySelector('#avatar_preview')?.addEventListener('error', (e) => {
-            if (e.target) {
-                (e.target as HTMLImageElement).src = dummyAvatarBase64;
-            }
-        });
+        replaceOnError(this.profile?.element.querySelector('#avatar_preview'));
     }
 
     private logout() {

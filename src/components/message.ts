@@ -40,14 +40,20 @@ export class Message implements IMessage {
 
     htmlElement?: HTMLElement;
 
-    datePretty: string;
+    datePretty?: string;
 
-    timePretty: string;
+    timePretty?: string;
 
-    dateTimePretty: string;
+    dateTimePretty?: string;
 
     constructor(message: IMessage) {
         Object.assign(this, message);
+        if (this.time) {
+            this.prettyfyDate();
+        }
+    }
+
+    private prettyfyDate() {
         const date = new Date(this.time);
         this.datePretty = date.toLocaleDateString();
         this.timePretty = date.toLocaleTimeString('ru-RU').slice(0, -3);

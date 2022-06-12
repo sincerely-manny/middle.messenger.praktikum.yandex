@@ -6,6 +6,8 @@ import { AppEvent, ETB } from '../modules/eventbus';
 import { MessagesAPI } from '../api/messages';
 import { UsersAPI } from '../api/users';
 import { appData } from '../modules/appdata';
+import { replaceOnError } from '../utils/dummyavatar';
+import getBase64Image from '../utils/imgbase64';
 
 export interface IChat {
     id: number,
@@ -39,17 +41,24 @@ export class Chat extends Block implements IChat {
 
     private scrollHeight?: number;
 
+    private _unixTimestamp: number = 0;
+
+    private _active: boolean = false;
+
     constructor(data: IChat) {
         super(data);
         Object.assign(this, data);
+
         this.getChatUsers();
         this.last_message = new Message(this.last_message);
-        if (this.last_message.content.length > 90) {
+        if (this.last_message?.content && this.last_message.content.length > 90) {
             this.last_message.content = `${[...this.last_message.content].slice(0, 90).join('').trim()}...`;
         }
+
         this.catchMessages = this.catchMessages.bind(this);
         this.api = new MessagesAPI(this.catchMessages);
         this.connect();
+
         this.scrollTopListener = this.scrollTopListener.bind(this);
         this.scrollToTheEnd = this.scrollToTheEnd.bind(this);
         this.loadPreviousMessages = this.loadPreviousMessages.bind(this);
@@ -65,7 +74,37 @@ export class Chat extends Block implements IChat {
 
     public set last_message(data: Message) {
         this._last_message = data;
+        if (data?.time) {
+            this.unixTimestamp = new Date(data.time).getTime();
+        } else {
+            this.unixTimestamp = 0 - this.id;
+        }
         this.renderChatListItem();
+    }
+
+    public get unixTimestamp() {
+        return this._unixTimestamp;
+    }
+
+    public set unixTimestamp(t: number) {
+        this._unixTimestamp = t;
+        const el = this.listHtmlElement;
+        if (el) {
+            el.setAttribute('style', `--timestamp: ${t}`);
+        }
+    }
+
+    public get active() {
+        return this._active;
+    }
+
+    public set active(a: boolean) {
+        this._active = a;
+        if (a) {
+            this.listHtmlElement?.classList.add('active');
+        } else {
+            this.listHtmlElement?.classList.remove('active');
+        }
     }
 
     public async connect() {
@@ -98,7 +137,36 @@ export class Chat extends Block implements IChat {
         return activeChat;
     }
 
+    public unload(): HTMLDivElement {
+        const ret = super.unload();
+        this.active = false;
+        return ret;
+    }
+
     public async renderChatListItem() {
+        if (this.title === appData.user.display_name_shown) {
+            const namesArr: Array<string> = [];
+            const users = await this.users;
+            if (Array.isArray(users)) {
+                users.forEach((u) => {
+                    if (u.id !== appData.user.id) {
+                        namesArr.push(u.display_name_shown);
+                    }
+                });
+            }
+            if (namesArr.length !== 0) {
+                this.title = namesArr.join(', ');
+            } else {
+                this.title = '...';
+            }
+        }
+
+        // если у чата нет аватарки или стоит наша – подставим кого-нибудь из собеседников
+        if (!this.avatar || await this.compareImage(this.avatar)) {
+            const users = await this.users;
+            this.avatar = users.find((u) => u.id !== appData.user.id)?.avatar || this.avatar;
+        }
+
         const [html] = await TE.render('chats_list/chat', null, this);
         if (this.listHtmlElement) {
             this.listHtmlElement.className.split(' ').forEach((c) => {
@@ -112,6 +180,10 @@ export class Chat extends Block implements IChat {
                 ETB.trigger(AppEvent.CHAT_LI_IS_Clicked, this);
             }
         });
+        replaceOnError(this.listHtmlElement.querySelector('.avatar > img') as HTMLElement);
+        if (this.active) {
+            this.listHtmlElement.classList.add('active');
+        }
         return this.listHtmlElement;
     }
 
@@ -159,9 +231,6 @@ export class Chat extends Block implements IChat {
             }
             if (sender.id !== +message.user_id || newDate) {
                 sender = appData.users[+message.user_id];
-                if (!sender.display_name) {
-                    sender.display_name = `${sender.first_name} ${sender.second_name}`;
-                }
                 rendered = rendered.concat(await TE.render('messages/sender', null, sender));
             }
             if (message.file) {
@@ -199,6 +268,7 @@ export class Chat extends Block implements IChat {
         }
         await super.place(parent);
         ETB.trigger(AppEvent.CHAT_IS_Placed, this);
+        this.active = true;
         return this._element;
     }
 
@@ -218,7 +288,7 @@ export class Chat extends Block implements IChat {
         } else {
             recievedMessages = data;
         }
-        if (recievedMessages[0].type !== 'pong') {
+        if (recievedMessages.length !== 0 && recievedMessages[0].type !== 'pong') {
             this._element.classList.remove('loading');
         } else {
             return;
@@ -294,6 +364,10 @@ export class Chat extends Block implements IChat {
             }
         }
         this.setScrollParams();
+    }
+
+    private async compareImage(url: string) {
+        return ((await appData.user.avatarBase64) === (await getBase64Image(url)));
     }
 }
 
