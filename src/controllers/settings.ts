@@ -81,7 +81,7 @@ export default class Settings extends View {
         this.profile?.element.querySelector('#avatar_input')?.addEventListener('change', () => {
             this.updateAvatar();
         });
-        replaceOnError(this.profile?.element.querySelector('#avatar_preview'));
+        replaceOnError(this.profile?.element.querySelector('#avatar_preview'), appData.user.display_name_shown);
     }
 
     private logout() {

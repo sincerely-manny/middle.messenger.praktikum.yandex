@@ -210,6 +210,7 @@
         border: 10px solid transparent;
         box-shadow: 0 0 0 1px @black;
         border-radius: 30px;
+        box-sizing: content-box;
 
         &:hover {
             opacity: 1;
@@ -232,6 +233,33 @@
             .image_as_bg('add-user.svg');
 
             background-size: 100%;
+            width: auto;
+            padding: 0 15px;
+            transition: width 0.5s;
+            overflow: hidden;
+
+            form {
+                left: -3px;
+                top: -100px;
+                display: block;
+                max-width: 0;
+                transition: max-width 0.3s, opacity 0.5s;
+                opacity: 0;
+            }
+
+            &:focus,
+            &:hover {
+                background-color: transparent;
+                background-size: 0;
+                overflow: visible;
+
+                form {
+                    top: 0;
+                    display: inline-block;
+                    max-width: 300px;
+                    opacity: 1;
+                }
+            }
         }
     }
 

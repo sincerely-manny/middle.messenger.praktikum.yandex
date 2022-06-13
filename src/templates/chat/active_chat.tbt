@@ -4,7 +4,8 @@
            <strong>Users in this chat:</strong><br>
            <ul class="users-in-chat-list" id="users-in-chat-list"></ul>
         </section>
-        <a href="/messenger" class="add" title="Add user to chat"></a>
+        <a href="/messenger" class="add" title="Add user to chat">
+        </a>
         <a href="/messenger" class="delete" title="Delete chat"></a>
         <a href="/messenger" class="close" title="Close chat"></a>
 

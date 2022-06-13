@@ -39,7 +39,7 @@ export default class ChatsList extends Block {
             }
         });
 
-        ETB.subcribe(AppEvent.USERS_SEARCH_Placed, this.bindCreateChat);
+        // ETB.subcribe(AppEvent.USERS_SEARCH_Placed, this.bindCreateChat);
         ETB.subcribe(AppEvent.CHATS_LIST_IS_Updated, this.update);
         ETB.subcribe(AppEvent.CHAT_ToBeDeleted, this.deleteChat);
 
@@ -58,7 +58,7 @@ export default class ChatsList extends Block {
             return [this._element];
         }
         const block = await TE.render('chats_list/chats_list', container);
-        const header = new ChatsListHeader();
+        const header = new ChatsListHeader(this.bindCreateChat);
         header.place(this.childById('chats-list-header', container));
         this._props.forEach(async (c: IChat, i: number, a: IChat[]) => {
             const chat = new Chat(c);
@@ -152,17 +152,14 @@ export default class ChatsList extends Block {
         return chat;
     }
 
-    private bindCreateChat(el: HTMLElement) {
-        el.querySelectorAll('ul.user-search-results>li').forEach((li) => {
-            // eslint-disable-next-line no-param-reassign
-            li.addEventListener('click', () => {
-                ETB.trigger(AppEvent.USERS_SEARCH_ToBeClosed);
-                const { id } = (li as HTMLElement).dataset;
-                if (id) {
-                    this.createChat([parseInt(id, 10)]);
-                }
-            });
-        });
+    private bindCreateChat(e: PointerEvent) {
+        const { id } = (e.currentTarget as HTMLElement).dataset;
+        if (id) {
+            ETB.trigger(AppEvent.USERS_SEARCH_ToBeClosed);
+            this.createChat([parseInt(id, 10)]);
+            (this._element.querySelector('form.serach-users') as HTMLFormElement).reset();
+            (this._element.querySelector('form.serach-users') as HTMLFormElement).blur();
+        }
     }
 
     public async createChat(users: Array<number>) {

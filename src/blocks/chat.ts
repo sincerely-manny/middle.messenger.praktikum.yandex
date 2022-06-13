@@ -11,6 +11,7 @@ import getBase64Image from '../utils/imgbase64';
 import { RTR } from '../modules/router';
 import { ChatUsersAPI } from '../api/chat_users';
 import { InappNotification, InappNotificationStatus } from '../components/notification';
+import SearchUserForm from './search_user_form';
 
 export interface IChat {
     id: number,
@@ -66,6 +67,7 @@ export class Chat extends Block implements IChat {
         this.scrollToTheEnd = this.scrollToTheEnd.bind(this);
         this.loadPreviousMessages = this.loadPreviousMessages.bind(this);
         this.initLoadMessages = this.initLoadMessages.bind(this);
+        this.bindAddToChat = this.bindAddToChat.bind(this);
     }
 
     public get last_message(): Message {
@@ -134,30 +136,8 @@ export class Chat extends Block implements IChat {
         if (this._element) {
             return [this._element];
         }
-        if (!await this.users) {
-            this.getChatUsers();
-        }
-        const usersInChat: Array<HTMLElement> = [];
-        // eslint-disable-next-line no-restricted-syntax
-        for (const u of (await this.users)) {
-            const li = (await TE.render('chat/user_in_chat', null, u))[0];
-            li.querySelector('a.remove')?.addEventListener('click', (e) => {
-                e.preventDefault();
-                const api = new ChatUsersAPI();
-                const NTF = new InappNotification();
-                api.delete({ users: [u.id], chatId: this.id }).then((r) => {
-                    if (r === 'OK') {
-                        li.remove();
-                        NTF.notify(`${u.display_name_shown} removed from chat`, InappNotificationStatus.INFO);
-                    } else {
-                        NTF.notify(`Error removing user: ${r.reason}`);
-                    }
-                });
-            });
-            usersInChat.push(li);
-        }
         const activeChat = TE.render('chat/active_chat', this._element);
-        TE.appendTo(this.childById('users-in-chat-list', (await activeChat)[0]), usersInChat);
+        await this.renderUsersInChat((await activeChat)[0]);
         this.messagesContainer = (await activeChat)[0].querySelector('#active-chat-messages') as HTMLElement;
         const newMsgContainer = (await activeChat)[0].querySelector('#active-chat-new-message') as HTMLElement;
         TE.render('chat/new_message_form', newMsgContainer).then(() => {
@@ -172,7 +152,34 @@ export class Chat extends Block implements IChat {
             e.preventDefault();
             ETB.trigger(AppEvent.CHAT_ToBeDeleted, this);
         });
+        const addButton = this._element.querySelector('#active-chat-header .add');
+        addButton?.addEventListener('click', (e) => {
+            e.preventDefault();
+        });
+        if (addButton) {
+            const searchUserForm = new SearchUserForm(this.bindAddToChat);
+            searchUserForm.place(addButton as HTMLElement);
+        }
+
         return activeChat;
+    }
+
+    private async renderUsersInChat(parent: HTMLElement) {
+        if (!await this.users) {
+            this.getChatUsers();
+        }
+        const usersInChat: Array<HTMLElement> = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const u of (await this.users)) {
+            const li = (await TE.render('chat/user_in_chat', null, u))[0];
+            li.querySelector('a.remove')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.removeUserFromChat(u, li);
+            });
+            usersInChat.push(li);
+        }
+        this.childById('users-in-chat-list', parent).innerHTML = '';
+        TE.appendTo(this.childById('users-in-chat-list', parent), usersInChat);
     }
 
     public unload(): HTMLDivElement {
@@ -185,7 +192,7 @@ export class Chat extends Block implements IChat {
     }
 
     public async renderChatListItem() {
-        if (this.title === appData.user.display_name_shown) {
+        if (this.title === appData.user.display_name_shown || this.title === '...') {
             const namesArr: Array<string> = [];
             const users = await this.users;
             if (Array.isArray(users)) {
@@ -221,7 +228,7 @@ export class Chat extends Block implements IChat {
                 ETB.trigger(AppEvent.CHAT_LI_IS_Clicked, this);
             }
         });
-        replaceOnError(this.listHtmlElement.querySelector('.avatar > img') as HTMLElement);
+        replaceOnError(this.listHtmlElement.querySelector('.avatar > img') as HTMLElement, this.title);
         if (this.active) {
             this.listHtmlElement.classList.add('active');
         }
@@ -410,6 +417,49 @@ export class Chat extends Block implements IChat {
 
     private async compareImage(url: string) {
         return ((await appData.user.avatarBase64) === (await getBase64Image(url)));
+    }
+
+    private removeUserFromChat(u: User, li?: HTMLElement) {
+        const api = new ChatUsersAPI();
+        const NTF = new InappNotification();
+        api.delete({ users: [u.id], chatId: this.id }).then(async (r) => {
+            if (r === 'OK') {
+                li?.remove();
+                NTF.notify(`${u.display_name_shown} removed from chat`, InappNotificationStatus.INFO);
+                this.getChatUsers();
+                this.renderChatListItem();
+            } else {
+                NTF.notify(`Error removing user: ${r.reason}`);
+            }
+        });
+    }
+
+    private addUserToChat(id: number) {
+        const api = new ChatUsersAPI();
+        const NTF = new InappNotification();
+        api.update({ users: [id], chatId: this.id }).then(async (r) => {
+            if (r === 'OK') {
+                this.getChatUsers();
+                const newUser = (await this.users).find((u) => u.id === id);
+                if (newUser) {
+                    NTF.notify(`${newUser?.display_name_shown} added to chat`, InappNotificationStatus.INFO);
+                    this.renderChatListItem();
+                    this.renderUsersInChat(this._element);
+                } else {
+                    NTF.notify('Error fetching added user info');
+                }
+            } else {
+                NTF.notify(`Error adding user: ${r.reason}`);
+            }
+        });
+    }
+
+    private bindAddToChat(e: PointerEvent) {
+        // ETB.trigger(AppEvent.USERS_SEARCH_ToBeClosed);
+        const { id } = (e.currentTarget as HTMLElement).dataset;
+        if (id) {
+            this.addUserToChat(+id);
+        }
     }
 }
 

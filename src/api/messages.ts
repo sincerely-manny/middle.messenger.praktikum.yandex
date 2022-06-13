@@ -1,3 +1,4 @@
+import { InappNotification, InappNotificationStatus } from '../components/notification';
 import { User } from '../modules/user';
 import { BaseAPI } from './base';
 
@@ -49,6 +50,7 @@ export class MessagesAPI extends BaseAPI {
 
     public getSocket(userId: number, chatId: number, token: string) {
         const socket = new WebSocket(`${this.socketURL}/${userId}/${chatId}/${token}`);
+        const NTF = new InappNotification();
         this.socket = socket;
         this.ping = setInterval(() => {
             socket.send(JSON.stringify({
@@ -62,11 +64,10 @@ export class MessagesAPI extends BaseAPI {
 
         socket.addEventListener('close', (event) => {
             if (event.wasClean) {
-                // console.log('Соединение закрыто чисто');
+                NTF.notify('Connection closed', InappNotificationStatus.NOTICE);
             } else {
-                // console.log('Обрыв соединения');
+                NTF.notify(`Connection broken: ${event.reason}`, InappNotificationStatus.ERROR);
             }
-
             // console.log(`Код: ${event.code} | Причина: ${event.reason}`);
         });
 
@@ -74,8 +75,9 @@ export class MessagesAPI extends BaseAPI {
             this.messageRecievedCallback(JSON.parse(event.data));
         });
 
-        socket.addEventListener('error', (_event) => {
+        socket.addEventListener('error', (event) => {
             this.connectionReject();
+            NTF.notify(`Connection error: ${(event as ErrorEvent).message}`, InappNotificationStatus.ERROR);
             // console.log('Ошибка', (event as ErrorEvent).message);
         });
         return this.socket;

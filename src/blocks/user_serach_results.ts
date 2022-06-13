@@ -5,19 +5,15 @@ import { User } from '../modules/user';
 import { replaceOnError } from '../utils/dummyavatar';
 
 export class UserSearchResults extends Block {
-    private static instance:UserSearchResults;
+    private fn: Function;
 
-    constructor() {
+    constructor(fn: Function) {
         super();
-        if (UserSearchResults.instance) {
-            return UserSearchResults.instance;
-        }
+        this.fn = fn;
         this._props = [];
 
         this.close = this.close.bind(this);
         ETB.subcribe(AppEvent.USERS_SEARCH_ToBeClosed, this.close);
-
-        UserSearchResults.instance = this;
     }
 
     public set users(data: User[]) {
@@ -38,9 +34,14 @@ export class UserSearchResults extends Block {
         if (!Array.isArray(this._props)) {
             return [document.createElement('div')];
         }
-        const resultsBlock = await TE.render('chats_list/search_results', container, { users: this._props });
+        const resultsBlock = await TE.render('forms/search_results', container, { users: this._props });
         resultsBlock[0].querySelectorAll('img').forEach((img) => {
-            replaceOnError(img);
+            replaceOnError(img, (img.alt || '0'));
+        });
+        resultsBlock[0].querySelectorAll('li').forEach((li) => {
+            li.addEventListener('click', (e) => {
+                this.fn(e);
+            });
         });
         return resultsBlock;
     }

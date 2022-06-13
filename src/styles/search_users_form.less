@@ -1,0 +1,116 @@
+form.serach-users {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: left;
+    left: 30px;
+    position: relative;
+    box-sizing: border-box;
+
+    input.search-text {
+        .text-input();
+
+        line-height: 32px;
+        padding: 0 32px 0 16px;
+        width: 250px;
+    }
+
+    input.search-button {
+        .submit_button();
+
+        cursor: pointer;
+        line-height: 32px;
+        padding: 0 0 0 22px;
+        margin: 0 0 0 -32px;
+        opacity: 0.5;
+        transition: opacity 0.5s;
+        .image_as_bg('search_icon.png');
+
+        &:hover {
+            opacity: 1;
+        }
+
+        &.loading {
+            .image_as_bg('preloader-circle.svg');
+        }
+    }
+
+    .user-search-results {
+        position: absolute;
+        z-index: 10;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: block;
+        background-color: @grey;
+        width: 250px;
+        box-sizing: border-box;
+        left: 0;
+        margin-top: 5px;
+        color: @black;
+        outline: 1px solid @black;
+
+        li {
+            display: block;
+            position: relative;
+            margin: 0;
+            // background-color: fade(@black, 30%);
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+            cursor: pointer;
+
+            img {
+                object-fit: cover;
+                object-position: 50% 50%;
+                width: 60px;
+                height: 60px;
+                float: left;
+                margin-right: 0.5em;
+            }
+
+            p {
+                display: block;
+                position: relative;
+                margin: 0;
+                padding: 0.5em 0 0;
+
+                &.display-name {
+                    font-weight: 500;
+                }
+
+                &.login {
+                    font-weight: 300;
+                    font-size: small;
+
+                    span {
+                        font-weight: 500;
+                    }
+                }
+            }
+
+            &:not(:first-child)::before {
+                display: block;
+                position: absolute;
+                content: ' ';
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 1px;
+                border-top: 1px solid @black;
+            }
+
+            &::after {
+                display: block;
+                content: ' ';
+                clear: both;
+            }
+
+            &:hover {
+                background-color: fade(@green, 50%);
+                .image_as_bg('new_chat.svg');
+
+                background-position: 195px 13px;
+                background-size: 50px;
+            }
+        }
+    }
+}
