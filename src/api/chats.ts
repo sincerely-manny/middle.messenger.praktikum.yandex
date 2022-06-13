@@ -9,15 +9,6 @@ type CreateChatResponse = {
     id: number,
 };
 
-type AddToChatData = {
-    users: number[],
-    chatId: number,
-};
-
-type AddToChatResponse = 'OK' | {
-    reason: string,
-};
-
 type UpdateAvatarData = FormData | {
     url: string
 };
@@ -26,6 +17,18 @@ type UpdateAvatarResponse = IChat & {
     reason?: string,
 };
 
+type DeleteChatData = {
+    chatId: number;
+};
+
+type DeleteChatResponse = {
+    userId: number,
+    result: {
+        id: number,
+        title: string,
+        avatar: string,
+    }
+};
 export class ChatsAPI extends BaseAPI {
     public async request(): Promise<IChat[]> {
         const url = `${this.baseURL}/chats`;
@@ -50,25 +53,6 @@ export class ChatsAPI extends BaseAPI {
         });
         const createChatResponse = JSON.parse(response.responseText);
         return createChatResponse;
-    }
-
-    public async update(data: AddToChatData): Promise<AddToChatResponse> {
-        const url = `${this.baseURL}/chats/users`;
-        const response = await this.http.put(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
-
-        let addToChatResponse: AddToChatResponse;
-        try {
-            addToChatResponse = JSON.parse(response.responseText);
-        } catch {
-            addToChatResponse = response.responseText as AddToChatResponse;
-        }
-        return addToChatResponse;
     }
 
     public async updateAvatar(
@@ -103,6 +87,19 @@ export class ChatsAPI extends BaseAPI {
             } as UpdateAvatarResponse;
         }
         return responseObj;
+    }
+
+    public async delete(data: DeleteChatData): Promise<DeleteChatResponse> {
+        const url = `${this.baseURL}/chats`;
+        const response = await this.http.delete(url, {
+            credentials: true,
+            headers: {
+                'content-type': 'application/json',
+            },
+            data,
+        });
+        const deleteChatResponse = JSON.parse(response.responseText);
+        return deleteChatResponse;
     }
 }
 

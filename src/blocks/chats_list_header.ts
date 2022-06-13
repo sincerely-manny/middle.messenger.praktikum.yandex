@@ -1,6 +1,7 @@
 import { UsersAPI } from '../api/users';
 import Block from '../components/block';
 import { ETB, AppEvent } from '../modules/eventbus';
+import { RTR } from '../modules/router';
 import { TE } from '../modules/templatebike';
 import { UserSearchResults } from './user_serach_results';
 
@@ -36,6 +37,13 @@ export class ChatsListHeader extends Block {
 
     private async renderAsync(container: HTMLElement) {
         const header = await TE.render('chats_list/header', container);
+        header[0]?.addEventListener('click', (e) => {
+            e.preventDefault();
+            RTR.go('settings');
+        });
+        if (RTR.root === 'settings') {
+            header[0]?.classList.add('active');
+        }
         ETB.trigger(AppEvent.CHATS_LIST_HEADER_IS_Rendered);
         return header;
     }

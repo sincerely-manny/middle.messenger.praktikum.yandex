@@ -50,7 +50,6 @@ export default class Settings extends View {
         this.profile?.unload();
         ETB.unsubscribe(AppEvent.CHATS_LIST_IS_Placed, this.init);
         ETB.unsubscribe(AppEvent.CHATS_LIST_HEADER_IS_Rendered, this.classActive);
-        // ETB.unsubscribe(AppEvent.PROFILE_IS_Rendered, this.bindEvents);
         ETB.unsubscribe(AppEvent.PROFILE_FORM_IS_Submitted, this.updateProfile);
         ETB.unsubscribe(AppEvent.PASSWORD_FORM_IS_Submitted, this.updatePassword);
         this.messenger?.stop();

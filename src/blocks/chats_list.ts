@@ -8,6 +8,7 @@ import { ChatsAPI } from '../api/chats';
 import { InappNotification, InappNotificationStatus } from '../components/notification';
 import { appData } from '../modules/appdata';
 import ChatsArray from '../modules/chatsArray';
+import { ChatUsersAPI } from '../api/chat_users';
 
 export default class ChatsList extends Block {
     public activeChat?: Chat;
@@ -24,6 +25,7 @@ export default class ChatsList extends Block {
 
         this.bindCreateChat = this.bindCreateChat.bind(this);
         this.update = this.update.bind(this);
+        this.deleteChat = this.deleteChat.bind(this);
 
         ETB.subcribe(AppEvent.CHAT_LI_IS_Clicked, (c: Chat) => { RTR.go(`messenger/${c.id}`); });
         ETB.subcribe(AppEvent.KEY_PRESSED_Escape, () => {
@@ -39,6 +41,7 @@ export default class ChatsList extends Block {
 
         ETB.subcribe(AppEvent.USERS_SEARCH_Placed, this.bindCreateChat);
         ETB.subcribe(AppEvent.CHATS_LIST_IS_Updated, this.update);
+        ETB.subcribe(AppEvent.CHAT_ToBeDeleted, this.deleteChat);
 
         ChatsList.instance = this;
     }
@@ -72,24 +75,32 @@ export default class ChatsList extends Block {
 
     private async update(
         optoins: {
-            fn: 'pop' | 'push' | 'shift' | 'unshift',
+            fn: 'pop' | 'push' | 'shift' | 'unshift' | 'splice',
             chats?: Chat[],
         },
     ) {
         const { fn, chats } = optoins;
-        if (fn === 'pop' || fn === 'shift') {
+        if (fn === 'pop' || fn === 'shift' || fn === 'splice') {
             chats?.forEach(async (chat) => {
                 chat.unload();
+                chat.disconnect();
+                chat.listHtmlElement?.remove();
             });
         } else if (fn === 'push') {
             chats?.forEach(async (chat) => {
-                const html = await chat.renderChatListItem();
-                TE.appendTo(document.getElementById('chats'), [html]);
+                // const html = await chat.renderChatListItem();
+                // TE.appendTo(document.getElementById('chats'), [html]);
+                chat.renderChatListItem().then((html) => {
+                    document.getElementById('chats')?.append(html);
+                });
             });
         } else if (fn === 'unshift') {
             chats?.forEach(async (chat) => {
-                const html = await chat.renderChatListItem();
-                TE.prependTo(document.getElementById('chats'), [html]);
+                // const html = await chat.renderChatListItem();
+                // TE.prependTo(document.getElementById('chats'), [html]);
+                chat.renderChatListItem().then((html) => {
+                    document.getElementById('chats')?.prepend(html);
+                });
             });
         }
     }
@@ -160,7 +171,8 @@ export default class ChatsList extends Block {
         const { user } = appData;
         const { id } = await api.create({ title: user.display_name_shown });
         if (Number.isInteger(id)) {
-            const added = await api.update({
+            const chatUsersAPI = new ChatUsersAPI();
+            const added = await chatUsersAPI.update({
                 users,
                 chatId: id,
             });
@@ -171,11 +183,24 @@ export default class ChatsList extends Block {
                 api.updateAvatar({ url: appData.user.avatar }, id).then((chatdata) => {
                     const chat = new Chat(chatdata);
                     this.chats.unshift(chat);
-                    this.openChat(chat);
+                    // this.openChat(chat);
+                    RTR.go(`messenger/${id}`);
                 });
             }
         } else {
             NTF.notify('Error creating chat', InappNotificationStatus.ERROR);
         }
+    }
+
+    public async deleteChat(chat: Chat) {
+        const index = this.chats.indexOf(chat);
+        const { title } = chat;
+        const api = new ChatsAPI();
+        const NTF = new InappNotification();
+        api.delete({ chatId: chat.id }).then(() => {
+            NTF.notify(`Chat "${title}" deleted`, InappNotificationStatus.INFO);
+            this.chats.splice(index, 1);
+            RTR.go('messenger');
+        });
     }
 }

@@ -1,4 +1,14 @@
 <div class="active-chat-container">
+    <div id="active-chat-header">
+        <section class="users-in-chat">
+           <strong>Users in this chat:</strong><br>
+           <ul class="users-in-chat-list" id="users-in-chat-list"></ul>
+        </section>
+        <a href="/messenger" class="add" title="Add user to chat"></a>
+        <a href="/messenger" class="delete" title="Delete chat"></a>
+        <a href="/messenger" class="close" title="Close chat"></a>
+
+    </div>
     <div class="active-chat-messages-container" id="active-chat-messages_container">
         <div id="active-chat-messages">
            

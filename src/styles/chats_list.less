@@ -166,14 +166,14 @@ form.serach-users {
 
 #chats {
     .flex-display();
-    .flex-direction(column);
+    .flex-direction(column-reverse);
 
     .chat {
         .flex-display();
 
-        .zoomin-vertical-animation();
+        // .zoomin-vertical-animation();
+        .flex-order(var(--data-timestamp));
 
-        order: var(--timestamp);
         color: inherit;
         text-decoration: inherit;
         .flex-basis(90px);

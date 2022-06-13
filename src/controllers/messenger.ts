@@ -61,11 +61,7 @@ class Messenger extends View {
     }
 
     private bindLinks() {
-        // debugger;
-        document.querySelector('#chats-list-header .profile-link')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            RTR.go('settings');
-        });
+
     }
 
     private bindNewMessageActions(chat: Chat) {

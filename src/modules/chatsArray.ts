@@ -37,7 +37,18 @@ export default class ChatsArray<T> extends Array<T> {
         return length;
     }
 
-    static get [Symbol.species]() {
-        return Array;
+    public splice(start: number, deleteCount: number, ...items: T[]): T[] {
+        // slice тоже помер
+        // const chats = this.slice(start, deleteCount);
+        const chats: T[] = [];
+        for (let i = 0; i < deleteCount; i++) {
+            chats.push(this[start + i]);
+        }
+        const e = super.splice(start, deleteCount, ...items);
+        ETB.trigger(AppEvent.CHATS_LIST_IS_Updated, {
+            fn: 'splice',
+            chats,
+        });
+        return e;
     }
 }

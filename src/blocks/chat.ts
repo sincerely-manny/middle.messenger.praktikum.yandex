@@ -8,6 +8,9 @@ import { UsersAPI } from '../api/users';
 import { appData } from '../modules/appdata';
 import { replaceOnError } from '../utils/dummyavatar';
 import getBase64Image from '../utils/imgbase64';
+import { RTR } from '../modules/router';
+import { ChatUsersAPI } from '../api/chat_users';
+import { InappNotification, InappNotificationStatus } from '../components/notification';
 
 export interface IChat {
     id: number,
@@ -63,9 +66,6 @@ export class Chat extends Block implements IChat {
         this.scrollToTheEnd = this.scrollToTheEnd.bind(this);
         this.loadPreviousMessages = this.loadPreviousMessages.bind(this);
         this.initLoadMessages = this.initLoadMessages.bind(this);
-        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.scrollToTheEnd);
-        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.scrollTopListener);
-        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.initLoadMessages);
     }
 
     public get last_message(): Message {
@@ -73,13 +73,20 @@ export class Chat extends Block implements IChat {
     }
 
     public set last_message(data: Message) {
+        let time: string = '';
+        const content = this?.last_message?.content;
+        if (this.last_message) {
+            time = this._last_message.time;
+        }
         this._last_message = data;
         if (data?.time) {
-            this.unixTimestamp = new Date(data.time).getTime();
+            this.unixTimestamp = new Date(data.time).getTime() / 1000 - 1640984400;
         } else {
             this.unixTimestamp = 0 - this.id;
         }
-        this.renderChatListItem();
+        if (data?.time !== time || data.content !== content) {
+            this.renderChatListItem();
+        }
     }
 
     public get unixTimestamp() {
@@ -90,7 +97,7 @@ export class Chat extends Block implements IChat {
         this._unixTimestamp = t;
         const el = this.listHtmlElement;
         if (el) {
-            el.setAttribute('style', `--timestamp: ${t}`);
+            el.setAttribute('style', `--data-timestamp:${t};`);
         }
     }
 
@@ -127,17 +134,51 @@ export class Chat extends Block implements IChat {
         if (this._element) {
             return [this._element];
         }
-        const activeChat = TE.render('chat/active_chat', this._element, this);
+        if (!await this.users) {
+            this.getChatUsers();
+        }
+        const usersInChat: Array<HTMLElement> = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const u of (await this.users)) {
+            const li = (await TE.render('chat/user_in_chat', null, u))[0];
+            li.querySelector('a.remove')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                const api = new ChatUsersAPI();
+                const NTF = new InappNotification();
+                api.delete({ users: [u.id], chatId: this.id }).then((r) => {
+                    if (r === 'OK') {
+                        li.remove();
+                        NTF.notify(`${u.display_name_shown} removed from chat`, InappNotificationStatus.INFO);
+                    } else {
+                        NTF.notify(`Error removing user: ${r.reason}`);
+                    }
+                });
+            });
+            usersInChat.push(li);
+        }
+        const activeChat = TE.render('chat/active_chat', this._element);
+        TE.appendTo(this.childById('users-in-chat-list', (await activeChat)[0]), usersInChat);
         this.messagesContainer = (await activeChat)[0].querySelector('#active-chat-messages') as HTMLElement;
         const newMsgContainer = (await activeChat)[0].querySelector('#active-chat-new-message') as HTMLElement;
         TE.render('chat/new_message_form', newMsgContainer).then(() => {
             ETB.trigger(AppEvent.CHAT_NEWMESSAGE_FORM_IS_Rendered, this);
         });
         [this._element] = (await activeChat);
+        this._element.querySelector('#active-chat-header .close')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            RTR.go('messenger');
+        });
+        this._element.querySelector('#active-chat-header .delete')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            ETB.trigger(AppEvent.CHAT_ToBeDeleted, this);
+        });
         return activeChat;
     }
 
     public unload(): HTMLDivElement {
+        ETB.unsubscribe(AppEvent.CHAT_IS_Placed, this.scrollToTheEnd);
+        ETB.unsubscribe(AppEvent.CHAT_IS_Rendered, this.scrollTopListener);
+        ETB.unsubscribe(AppEvent.CHAT_IS_Rendered, this.initLoadMessages);
         const ret = super.unload();
         this.active = false;
         return ret;
@@ -175,8 +216,8 @@ export class Chat extends Block implements IChat {
             this.listHtmlElement.replaceWith(html);
         }
         this.listHtmlElement = html;
-        this.listHtmlElement.addEventListener('click', (e) => {
-            if (!(e.target as HTMLElement).classList.contains('active')) {
+        this.listHtmlElement.addEventListener('click', () => {
+            if (!this.active) {
                 ETB.trigger(AppEvent.CHAT_LI_IS_Clicked, this);
             }
         });
@@ -255,7 +296,7 @@ export class Chat extends Block implements IChat {
         if (insertFn === prependTo) {
             this.preserveScroll();
         } else {
-            this.scrollToTheEnd(this);
+            this.scrollToTheEnd();
         }
         this.last_message = this.messages[this.messages.length - 1];
         ETB.trigger(AppEvent.CHAT_IS_Rendered, this);
@@ -263,6 +304,9 @@ export class Chat extends Block implements IChat {
     }
 
     public async place(parent: HTMLElement) {
+        ETB.subcribe(AppEvent.CHAT_IS_Placed, this.scrollToTheEnd);
+        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.scrollTopListener);
+        ETB.subcribe(AppEvent.CHAT_IS_Rendered, this.initLoadMessages);
         if (this.messages.length === 0) {
             this.requestMessages(0);
         }
@@ -312,54 +356,52 @@ export class Chat extends Block implements IChat {
         appData.setUser(await this.users);
     }
 
-    private scrollTopListener(c: Chat) {
-        if (c !== this) {
-            return;
-        }
-        const chatCont = this._element.querySelector('#active-chat-messages_container');
-        chatCont?.addEventListener('scroll', this.loadPreviousMessages, { passive: true });
+    private scrollTopListener() {
+        this.messagesContainer?.parentElement?.addEventListener('scroll', this.loadPreviousMessages, { passive: true });
     }
 
     private loadPreviousMessages() {
-        const chatCont = this._element.querySelector('#active-chat-messages_container');
-        if (chatCont?.scrollTop === 0) {
+        if (this.messagesContainer?.parentElement?.scrollTop === 0) {
             this.requestMessages(this.messages.length);
-            chatCont.removeEventListener('scroll', this.loadPreviousMessages);
+            this.messagesContainer?.parentElement?.removeEventListener('scroll', this.loadPreviousMessages);
         }
     }
 
     private initLoadMessages() {
-        const chatCont = this._element.querySelector('#active-chat-messages_container');
-        if (chatCont && (chatCont?.scrollHeight <= chatCont?.clientHeight)) {
+        if (
+            this.messagesContainer?.parentElement
+            && (
+                this.messagesContainer?.parentElement?.scrollHeight
+                <= this.messagesContainer?.parentElement?.clientHeight
+            )
+        ) {
             this.loadPreviousMessages();
         }
     }
 
-    private scrollToTheEnd(c: Chat) {
-        if (c !== this) {
-            return;
-        }
+    private scrollToTheEnd() {
         ETB.unsubscribe(AppEvent.CHAT_IS_Rendered, this.scrollToTheEnd);
-        const chatCont = this._element.querySelector('#active-chat-messages_container');
-        if (chatCont) {
-            chatCont.scrollTo({ top: chatCont.scrollHeight });
+        if (this.messagesContainer?.parentElement) {
+            setTimeout(() => {
+                this.messagesContainer?.parentElement?.scrollTo(
+                    { top: this.messagesContainer.parentElement.scrollHeight },
+                );
+            }, 100);
         }
     }
 
     private setScrollParams() {
-        const chatCont = this._element.querySelector('#active-chat-messages_container');
-        if (chatCont) {
-            this.scrollHeight = chatCont.scrollHeight;
+        if (this.messagesContainer?.parentElement) {
+            this.scrollHeight = this.messagesContainer.parentElement.scrollHeight;
         }
     }
 
     private preserveScroll() {
-        const chatCont = this._element.querySelector('#active-chat-messages_container');
-        if (chatCont && this.scrollHeight) {
-            if (chatCont.scrollHeight > this.scrollHeight) {
-                const delta = chatCont.scrollHeight - this.scrollHeight;
-                chatCont.scrollTo({
-                    top: (chatCont.scrollTop + (delta / 2)),
+        if (this.messagesContainer?.parentElement && this.scrollHeight) {
+            if (this.messagesContainer.parentElement.scrollHeight > this.scrollHeight) {
+                const delta = this.messagesContainer.parentElement.scrollHeight - this.scrollHeight;
+                this.messagesContainer.parentElement.scrollTo({
+                    top: (this.messagesContainer.parentElement.scrollTop + (delta / 2)),
                 });
             }
         }

@@ -10,6 +10,7 @@ export enum AppEvent {
     CHAT_NEW_MESSAGES_Appended,
     CHAT_IS_Placed,
     CHAT_IS_Closed,
+    CHAT_ToBeDeleted,
     NOCHAT_IS_Placed,
     KEY_PRESSED_Escape,
     MODAL_IS_Rendered,

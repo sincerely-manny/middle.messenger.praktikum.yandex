@@ -1,0 +1,1 @@
+<li title="{{$login}}"><a href="/messenger" class="remove" data-user-id="{{$id}}" title="Remove user from chat"></a>{{$display_name_shown}}</li>
