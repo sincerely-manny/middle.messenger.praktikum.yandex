@@ -243,8 +243,11 @@
                 top: -100px;
                 display: block;
                 max-width: 0;
-                transition: max-width 0.3s, opacity 0.5s;
+                transform: scaleX(0);
+                transform-origin: 0 0;
+                transition: max-width 0.3s, opacity 0.5s, transform 0.3s;
                 opacity: 0;
+                white-space: nowrap;
             }
 
             &:focus,
@@ -256,8 +259,9 @@
                 form {
                     top: 0;
                     display: inline-block;
-                    max-width: 300px;
+                    max-width: 250px;
                     opacity: 1;
+                    transform: scaleX(1);
                 }
             }
         }

@@ -1,5 +1,5 @@
 <form action="/messenger" class="serach-users" autocomplete="off" tabindex="-1">
-    <input type="text" name="serach-users" placeholder="Search..." class="search-text">
+    <input type="text" name="serach-users" placeholder="Search user (login)" class="search-text">
     <input type="submit" value="Search" class="search-button">
     <div class="user-search-results-container"></div>
 </form>

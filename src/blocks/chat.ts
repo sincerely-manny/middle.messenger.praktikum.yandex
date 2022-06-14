@@ -191,7 +191,12 @@ export class Chat extends Block implements IChat {
         return ret;
     }
 
-    public async renderChatListItem() {
+    public async renderChatListItem(): Promise<HTMLElement | undefined> {
+        // Да, так надо чтобы не перерисовывать 2 раза при загрузке
+        // метод вызовется после парсинга последнего сообщения
+        if (!(this.last_message instanceof Message)) {
+            return this.listHtmlElement;
+        }
         if (this.title === appData.user.display_name_shown || this.title === '...') {
             const namesArr: Array<string> = [];
             const users = await this.users;
