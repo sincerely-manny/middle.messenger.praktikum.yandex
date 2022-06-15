@@ -91,7 +91,7 @@ export default class ChatsList extends Block {
                 // const html = await chat.renderChatListItem();
                 // TE.appendTo(document.getElementById('chats'), [html]);
                 chat.renderChatListItem().then((html) => {
-                    document.getElementById('chats')?.append(html);
+                    document.getElementById('chats')?.append(html as Node);
                 });
             });
         } else if (fn === 'unshift') {
@@ -99,7 +99,7 @@ export default class ChatsList extends Block {
                 // const html = await chat.renderChatListItem();
                 // TE.prependTo(document.getElementById('chats'), [html]);
                 chat.renderChatListItem().then((html) => {
-                    document.getElementById('chats')?.prepend(html);
+                    document.getElementById('chats')?.prepend(html as Node);
                 });
             });
         }

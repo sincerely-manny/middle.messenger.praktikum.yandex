@@ -5,12 +5,13 @@
   "keywords": [],
   "license": "ISC",
   "author": "",
+  "type": "module",
   "scripts": {
     "dev": "parcel static/index.html -p 3000 --no-cache",
     "build": "parcel build static/index.html --no-cache --no-optimize",
     "start": "npm run build && npm run dev",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "echo \"ESLINT: \" && npx eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\""
+    "lint": "echo \"ESLINT: \" && npx eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\"",
+    "test": "./node_modules/.bin/mocha"
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "2.5.0",
@@ -19,12 +20,21 @@
     "@parcel/transformer-less": "2.5.0",
     "@parcel/transformer-webmanifest": "2.5.0",
     "@sincerely-manny/parcel-transformer-tbt": "github:sincerely-manny/parcel-transformer-tbt",
+    "@types/chai": "4.3.1",
+    "@types/jsdom": "16.2.14",
+    "@types/jsdom-global": "3.0.2",
+    "@types/mocha": "9.1.1",
     "@typescript-eslint/eslint-plugin": "5.22.0",
     "@typescript-eslint/parser": "5.22.0",
+    "chai": "4.3.6",
     "eslint": "8.17.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-airbnb-typescript": "17.0.0",
+    "jsdom": "19.0.0",
+    "jsdom-global": "3.0.2",
     "less": "~4.1.2",
+    "mocha": "10.0.0",
+    "mocha-jsdom": "2.0.0",
     "parcel": "2.5.0",
     "path-browserify": "1.0.1",
     "postcss-less": "6.0.0",
@@ -32,6 +42,8 @@
     "stylelint": "14.8.2",
     "stylelint-config-standard": "25.0.0",
     "stylelint-less": "1.0.5",
+    "ts-mocha": "10.0.0",
+    "ts-node": "10.8.1",
     "typescript": "4.7.3"
   },
   "engines": {
@@ -66,9 +78,13 @@
       "default-case-last": "warn",
       "no-underscore-dangle": "off",
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": ["off"],
+      "@typescript-eslint/no-unused-vars": [
+        "off"
+      ],
       "no-constructor-return": "off",
-      "class-methods-use-this": ["off"]
+      "class-methods-use-this": [
+        "off"
+      ]
     }
   },
   "stylelint": {
