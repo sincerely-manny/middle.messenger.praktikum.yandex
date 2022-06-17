@@ -20,10 +20,6 @@ export class SignupAPI extends BaseAPI {
     public async create(data: SignupUserData): Promise<SignupResponse> {
         const url = `${this.baseURL}/auth/signup`;
         const response = await this.http.post(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
             data,
         });
         const singupResponse: SignupResponse = JSON.parse(response.responseText);
