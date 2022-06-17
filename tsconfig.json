@@ -1,10 +1,12 @@
 {
     "compilerOptions": {
+        "baseUrl": "./",
+        "module": "ES2020",
         "outDir": "dist",
         "lib": [
             "es2017",
             "DOM",
-            "DOM.Iterable",
+            "DOM.Iterable"
         ],
         "target": "es2016",
         "noUnusedLocals": true,
@@ -16,5 +18,9 @@
         "strict": true,
         "moduleResolution": "node",
         "resolveJsonModule": true,
-   }
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+    },
+    "include": ["./**/*.ts"],
+    "exclude": ["node_modules"]
 } 

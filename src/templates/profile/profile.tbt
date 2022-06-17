@@ -1,5 +1,5 @@
 <article class="user-profile">
-    <a href="#chat" class="goback-button">
+    <a href="/messenger" class="goback-button">
         <svg width="28" height="49" viewBox="0 0 28 49" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M27.7162 5.19124L23.5125 0.987488L0 24.5L23.5125 48.0125L27.7162 43.8087L8.4075 24.5L27.7162 5.19124Z" fill="#DCFF7D"/>
         </svg>

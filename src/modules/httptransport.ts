@@ -1,24 +1,22 @@
-const METHODS = {
-    GET: 'GET',
-    POST: 'POST',
-    PUT: 'PUT',
-    PATCH: 'PATCH',
-    DELETE: 'DELETE',
-};
+enum METHODS {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    PATCH = 'PATCH',
+    DELETE = 'DELETE',
+}
 
 type Options = {
-    headers?: {
-        [s: string]: string
-    },
-    data?: {
-        [s: string]: string
-    },
+    headers?: Record<string, string>,
+    data?: Record<string, string | Array<any> | number> | FormData,
     timeout?: number,
     method?: typeof METHODS[keyof typeof METHODS],
+    credentials?: boolean,
+    responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text',
 };
 
 export default class HTTPTransport {
-    get(url: string, options: Options) {
+    get(url: string, options: Options = {}) {
         let queryString: string = '';
         if (options.data) {
             queryString = Object.entries(options.data)
@@ -32,7 +30,7 @@ export default class HTTPTransport {
         );
     }
 
-    put(url: string, options: Options) {
+    put(url: string, options: Options = {}) {
         return this.request(
             url,
             { ...options, method: METHODS.PUT },
@@ -40,7 +38,7 @@ export default class HTTPTransport {
         );
     }
 
-    post(url: string, options: Options) {
+    post(url: string, options: Options = {}) {
         return this.request(
             url,
             { ...options, method: METHODS.POST },
@@ -48,7 +46,7 @@ export default class HTTPTransport {
         );
     }
 
-    delete(url: string, options: Options) {
+    delete(url: string, options: Options = {}) {
         return this.request(
             url,
             { ...options, method: METHODS.DELETE },
@@ -56,10 +54,20 @@ export default class HTTPTransport {
         );
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    request(url: string, options: Options, timeout = 5000) {
-        let { method } = options;
-        const { data } = options;
+    request(url: string, options: Options, timeout = 5000): Promise<XMLHttpRequest> {
+        let { method, headers } = options;
+        const {
+            credentials, data, responseType,
+        } = options;
+        if (headers && headers['content-type'] === 'no-set') {
+            delete headers['content-type'];
+        } else {
+            const defaultHeaders: Options['headers'] = {
+                'content-type': 'application/json',
+            };
+
+            headers = { ...defaultHeaders, ...headers };
+        }
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -67,10 +75,16 @@ export default class HTTPTransport {
             if (!method) {
                 method = METHODS.GET;
             }
+            if (credentials || credentials === undefined) {
+                xhr.withCredentials = true;
+            }
+            if (responseType) {
+                xhr.responseType = responseType;
+            }
             xhr.open(method, url);
             xhr.timeout = timeout;
-            if (options.headers) {
-                Object.entries(options.headers).forEach((h) => {
+            if (headers) {
+                Object.entries(headers).forEach((h) => {
                     xhr.setRequestHeader(h[0], h[1]);
                 });
             }
@@ -85,6 +99,8 @@ export default class HTTPTransport {
 
             if (method === METHODS.GET || !data) {
                 xhr.send();
+            } else if (data instanceof FormData) {
+                xhr.send(data);
             } else {
                 xhr.send(JSON.stringify(data));
             }

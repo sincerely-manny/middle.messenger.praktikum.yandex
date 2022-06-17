@@ -204,8 +204,8 @@ export const users = [
         login: 'ereddi',
         display_name: 'Edi Redd',
         email: 'ereddi@wired.com',
-        password: 'p3PBYO',
-        phone: '+355 (927) 973-2369',
+        password: 'p3PBYOfds',
+        phone: '+7 (927) 973-2369',
         avatar: new URL('/static/img/avatars/av19.jpg', import.meta.url).href,
     },
     {
@@ -216,7 +216,7 @@ export const users = [
         display_name: 'Van Skellern',
         email: 'vskellernj@chron.com',
         password: '71nh2smTN',
-        phone: '+62 (924) 174-3904',
+        phone: '+7 (924) 174-3904',
         avatar: new URL('/static/img/avatars/av20.jpg', import.meta.url).href,
     },
 ];

@@ -1,41 +1,46 @@
 /**
- * @File   : templatebike.js
- * @Author :  ()
- * @Link   :
- * @Date   : 4/17/2022, 4:53:24 PM
- */
-
-/**
  * {{$var}} => value
  * {{$arr}} {{$var}} {{/$arr}} => foreach
- *
- * let TE = new TemplateBike(data, path/to/templates);
- * TE.render(templateName, targetElem);
  */
 
-import * as importedTemplates from '../utils/importTemplates';
+import { importTemplatesFS } from '../utils/importTemplatesFS'; // только для тестов
+
+let importedTemplates: any;
+try {
+    // eslint-disable-next-line global-require
+    importedTemplates = require('../utils/importTemplates'); // на этом валится mocha, но жрет parcel
+} catch {
+    importedTemplates = importTemplatesFS;
+}
 
 const TEXT_NODE = 3;
 const ELEMENT_NODE = 1;
 
-export default class TemplateBike {
+export class TemplateBike {
     private static instance: TemplateBike;
 
-    protected readonly regexp: {
+    protected readonly regexp!: {
         temptateExpression: RegExp;
         variable: RegExp;
         each: (marker: any) => RegExp;
     };
 
-    protected readonly pathToTemplates: string;
+    protected readonly pathToTemplates!: string;
 
     protected templates: any;
 
-    protected renderedCollection: Element;
+    protected renderedCollection!: HTMLElement;
 
     private _data?: { [key: string]: any } = {};
 
-    private constructor(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages') {
+    constructor(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages') {
+        if (TemplateBike.instance) {
+            if (!TemplateBike.instance._data) {
+                TemplateBike.instance._data = data;
+            }
+            return TemplateBike.instance;
+        }
+
         this.templates = importedTemplates.tmpl;
         this._data = data;
         this.pathToTemplates = pathToTemplates;
@@ -45,34 +50,28 @@ export default class TemplateBike {
             each(marker) { return new RegExp(`{{\\$${marker}}}([^]*){{/\\$${marker}}}`, 'gi'); },
         };
         this.renderedCollection = document.createElement('div');
-    }
 
-    public static getInstance(data: { [key: string]: any } | undefined = undefined, pathToTemplates = '/src/pages'): TemplateBike {
-        if (!TemplateBike.instance) {
-            TemplateBike.instance = new TemplateBike(data, pathToTemplates);
-        }
-        if (!TemplateBike.instance._data) {
-            TemplateBike.instance._data = data;
-        }
-
-        return TemplateBike.instance;
+        TemplateBike.instance = this;
     }
 
     public get data():typeof this._data {
         return this._data;
     }
 
-    // eslint-disable-next-line class-methods-use-this
-    public set data(_v) {
-        throw new Error('access denied');
+    public set data(v) {
+        if (!this._data) {
+            this._data = v;
+        } else {
+            throw new Error('access denied');
+        }
     }
 
-    private renderNode(node: Element, dataset: object | boolean = false): Element {
+    private renderNode(node: HTMLElement, dataset: object | boolean = false): HTMLElement {
         if (node.hasChildNodes()) {
             // foreach не подходит: при добавлении отрендеренных нод длина массива меняется
             for (let i = 0; i < node.childNodes.length; i++) {
                 const child = node.childNodes[i];
-                const childElement = <Element> child;
+                const childElement = <HTMLElement> child;
                 if (child.nodeType === TEXT_NODE) { // если текстовая нода – парсим текст
                     childElement.textContent = this.renderExpressionString(
                         child.textContent,
@@ -102,7 +101,7 @@ export default class TemplateBike {
 
     private renderExpressionString(
         string: string | null,
-        currentNode:Element = document.body,
+        currentNode:HTMLElement = document.body,
         dataset: object | boolean = false,
     ): string {
         if (string === null) return '';
@@ -133,8 +132,12 @@ export default class TemplateBike {
         return renderedString;
     }
 
-    private renderArray(foundVariableName: string, varValue: Array<object>, currentNode: Element) {
-        const node = <Element> currentNode;
+    private renderArray(
+        foundVariableName: string,
+        varValue: Array<object>,
+        currentNode: HTMLElement,
+    ) {
+        const node = <HTMLElement> currentNode;
         if (
             node.parentElement !== null
             && this.regexp.each(foundVariableName).test(node.parentElement.innerHTML)
@@ -180,7 +183,7 @@ export default class TemplateBike {
             return defaultValue;
         }
         if (Array.isArray(value) || value instanceof HTMLElement) return value;
-        return value.toString() ?? defaultValue;
+        return value?.toString() ?? defaultValue;
     }
 
     private async fetchTemplate(templateName: string) {
@@ -195,13 +198,13 @@ export default class TemplateBike {
 
     public async render(
         templateName: string,
-        targetElem: Element | null = null,
+        targetElem: HTMLElement | null = null,
         dataset: object | boolean = false,
-    ): Promise<Element[]> {
+    ): Promise<HTMLElement[]> {
         const template = await this.fetchTemplate(templateName);
         const element = document.createElement('div');
         element.innerHTML = template;
-        this.renderedCollection = <Element> this.renderNode(element, dataset);
+        this.renderedCollection = <HTMLElement> this.renderNode(element, dataset);
         const collectionArray = this.collectionToArray(this.renderedCollection);
         if (targetElem != null) {
             this.appendTo(targetElem);
@@ -210,23 +213,20 @@ export default class TemplateBike {
         return collectionArray;
     }
 
-    private collectionToArray(renderedCollection = this.renderedCollection): Element[] {
+    private collectionToArray(renderedCollection = this.renderedCollection): HTMLElement[] {
         const renderCollectionArray = [];
         for (let i = 0; i < renderedCollection.childNodes.length; i++) {
             renderCollectionArray.push(renderedCollection.childNodes[i]);
         }
-        return renderCollectionArray as Element[];
+        return renderCollectionArray as HTMLElement[];
     }
 
     public appendTo(
-        targetElem: Element | null,
-        renderedCollection: Element | Element[] = this.renderedCollection,
+        targetElem: HTMLElement | null,
+        renderedCollection: HTMLElement | HTMLElement[] = this.renderedCollection,
         prepend = false,
-    ): Element | null {
+    ): HTMLElement | null {
         if (targetElem !== null) {
-            // while (renderedCollection.childNodes.length > 0) {
-            //     targetElem.append(renderedCollection.childNodes[0]);
-            // }
             let colArr = [];
             if (!Array.isArray(renderedCollection)) {
                 colArr = this.collectionToArray(renderedCollection);
@@ -251,9 +251,13 @@ export default class TemplateBike {
     }
 
     public prependTo(
-        targetElem: Element | null,
-        renderedCollection: Element | Element[] = this.renderedCollection,
-    ): Element | null {
+        targetElem: HTMLElement | null,
+        renderedCollection: HTMLElement | HTMLElement[] = this.renderedCollection,
+    ): HTMLElement | null {
         return this.appendTo(targetElem, renderedCollection, true);
     }
 }
+
+export const TE = new TemplateBike();
+
+export default { TemplateBike, TE };

@@ -40,51 +40,27 @@
 
         &:active,
         &:focus,
-        .active {
+        &.active {
             svg {
                 fill: @green;
             }
         }
     }
 
-    form.serach-chats {
+    .form-container {
         display: table-cell;
         vertical-align: middle;
-        text-align: left;
-        padding: 0 0 0 30px;
-
-        input.search-text {
-            .text-input();
-
-            line-height: 32px;
-            padding: 0 32px 0 16px;
-            width: 250px;
-        }
-
-        input.search-button {
-            .submit_button();
-
-            cursor: pointer;
-            line-height: 32px;
-            padding: 0 0 0 22px;
-            margin: 0 0 0 -32px;
-            opacity: 0.5;
-            transition: opacity 0.5s;
-            .image_as_bg('search_icon.png');
-
-            &:hover {
-                opacity: 1;
-            }
-        }
     }
 }
 
 #chats {
     .flex-display();
-    .flex-direction(column);
+    .flex-direction(column-reverse);
 
     .chat {
         .flex-display();
+
+        .flex-order(var(--data-timestamp));
 
         color: inherit;
         text-decoration: inherit;
@@ -113,6 +89,7 @@
             width: 90px;
             float: left;
             margin-right: 16px;
+            background-color: fade(@grey, 50%);
 
             img {
                 object-fit: cover;
@@ -179,21 +156,6 @@
             background-color: fade(@green, 10%);
         }
 
-        &:not([data-unread='0']) {
-            .last-message-preview {
-                font-weight: 400;
-                color: fade(@grey, 90%);
-            }
-
-            div.info {
-                .unread-count {
-                    display: block;
-                    background-color: @green;
-                    opacity: 1;
-                }
-            }
-        }
-
         &.active {
             background-color: fade(@green, 50%);
 
@@ -210,6 +172,21 @@
                 position: absolute;
                 top: -22px;
                 right: -90px;
+            }
+        }
+
+        &[data-unread]:not([data-unread='']):not([data-unread='0']) {
+            .last-message-preview {
+                font-weight: 400;
+                color: fade(@grey, 90%);
+            }
+
+            div.info {
+                .unread-count {
+                    display: block;
+                    background-color: @green;
+                    opacity: 1;
+                }
             }
         }
     }

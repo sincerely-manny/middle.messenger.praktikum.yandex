@@ -1,8 +1,6 @@
-import TemplateBike from '../modules/templatebike';
+import { TE } from '../modules/templatebike';
 import { Form } from './form';
 import { InputData } from './input';
-
-const TE = TemplateBike.getInstance();
 
 export type ProfileFormData = {
     action: string,
@@ -34,7 +32,8 @@ export class ProfileForm extends Form {
         } else {
             submit.hidden = true;
         }
-        form.append(submit as Element);
+        form.append(submit as HTMLElement);
+        this.submitBtn = submit;
 
         this.form = form as HTMLFormElement;
         form.addEventListener('submit', this._props.onSubmit);

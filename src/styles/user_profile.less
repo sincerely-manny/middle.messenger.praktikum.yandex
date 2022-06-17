@@ -30,6 +30,13 @@
         }
     }
 
+    input[type='text'],
+    input[type='password'] {
+        .form_table();
+
+        margin: 30px 0 45px;
+    }
+
     input[type='file'] {
         width: 0.1px;
         height: 0.1px;
@@ -84,13 +91,6 @@
         }
     }
 
-    input[type='text'],
-    input[type='password'] {
-        .form_table();
-
-        margin: 30px 0 45px;
-    }
-
     .label-after {
         display: block;
         height: 0;
@@ -113,5 +113,15 @@
         .small_submit();
 
         float: right;
+        margin-bottom: 30px;
+        transition: all 0.3s;
+
+        &:disabled {
+            .image_as_bg('preloader.svg');
+
+            background-size: cover;
+            background-color: fade(@black, 0%);
+            color: fade(@black, 0%);
+        }
     }
 }

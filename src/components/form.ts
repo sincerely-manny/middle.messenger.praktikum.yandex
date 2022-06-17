@@ -5,13 +5,14 @@ export abstract class Form {
 
     public form?: HTMLFormElement;
 
-    public inputs?: HTMLInputElement[] = [];
+    public inputs?: InputField[] = [];
+
+    public submitBtn?: HTMLInputElement;
 
     constructor(data: {}) {
         this._props = data;
     }
 
-    // eslint-disable-next-line class-methods-use-this
     public render() {
 
     }
@@ -19,9 +20,7 @@ export abstract class Form {
     protected createInput(data: InputData) {
         const input = new InputField(data);
         const rendered = input.render();
-        if (input.html) {
-            this.inputs?.push(input.html);
-        }
+        this.inputs?.push(input);
         return rendered;
     }
 
@@ -40,7 +39,6 @@ export abstract class Form {
         }
     }
 
-    // eslint-disable-next-line class-methods-use-this
     private compare(oldV: any, newV: any) {
         return Object.keys(oldV).every(
             (key) => (
@@ -51,20 +49,9 @@ export abstract class Form {
     }
 
     public logObject() {
-        // да, уродливо, зато быстро
-        this.inputs?.forEach((i) => { // триггерим валидацию всех полей при сабмите
-            i.focus();
-            i.blur();
+        this.inputs?.forEach((i) => {
+            i.validate();
         });
-        const object: { [key: string]: FormDataEntryValue | null } = {};
-        const formData = new FormData(this.form);
-        // eslint-disable-next-line no-restricted-syntax
-        for (const k of formData.keys()) {
-            object[k] = formData.get(k);
-        }
-        // eslint-disable-next-line no-console
-        console.log(object);
-        return object;
     }
 }
 
