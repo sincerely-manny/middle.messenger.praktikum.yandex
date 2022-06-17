@@ -20,24 +20,10 @@ export class SignupAPI extends BaseAPI {
     public async create(data: SignupUserData): Promise<SignupResponse> {
         const url = `${this.baseURL}/auth/signup`;
         const response = await this.http.post(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
             data,
         });
         const singupResponse: SignupResponse = JSON.parse(response.responseText);
         if (singupResponse.id) {
-            // const singinAPI = new SigninAPI();
-            // const signinResponse = await singinAPI.request({
-            //     login: data.login,
-            //     password: data.password,
-            // });
-            // if (signinResponse instanceof Object && signinResponse.reason) {
-            //     signinResponse.reason = `User with id#${singupResponse.id} was created, but:
-            //         ${signinResponse.reason} (trying to sign-in)`;
-            //     return signinResponse;
-            // }
             const userinfoAPI = new UserinfoAPI();
             const userinfoResponse = await userinfoAPI.request();
             if (userinfoResponse.reason) {

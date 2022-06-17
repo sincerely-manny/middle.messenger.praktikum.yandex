@@ -29,7 +29,6 @@ export class UserSearchResults extends Block {
     }
 
     private async renderAsync(container: HTMLElement) {
-        // eslint-disable-next-line no-param-reassign
         container.innerHTML = '';
         if (!Array.isArray(this._props)) {
             return [document.createElement('div')];

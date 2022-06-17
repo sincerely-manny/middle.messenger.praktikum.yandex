@@ -7,7 +7,6 @@ export function replaceOnError(
     if (elem) {
         elem.addEventListener('error', (e) => {
             if (e.target) {
-                // (e.target as HTMLImageElement).src = dummyAvatarBase64;
                 (e.target as HTMLImageElement).src = `https://joeschmoe.io/api/v1/${seed}`;
             }
         });

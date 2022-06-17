@@ -19,12 +19,7 @@ export type UpdatePasswordResponse = 'OK' | {
 export class UserinfoAPI extends BaseAPI {
     public async request(): Promise<UserinfoResponse> {
         const url = `${this.baseURL}/auth/user`;
-        const response = await this.http.get(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-        });
+        const response = await this.http.get(url);
         const responseObj: UserinfoResponse = JSON.parse(response.responseText);
         if (!responseObj.reason) {
             return new User(responseObj);
@@ -35,10 +30,6 @@ export class UserinfoAPI extends BaseAPI {
     public async update(data: UpdateUserData): Promise<UserinfoResponse> {
         const url = `${this.baseURL}/user/profile`;
         const response = await this.http.put(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
             data,
         });
         const updateResponse: UserinfoResponse = JSON.parse(response.responseText);
@@ -51,10 +42,6 @@ export class UserinfoAPI extends BaseAPI {
     public async updatePassword(data: UpdatePasswordData): Promise<UpdatePasswordResponse> {
         const url = `${this.baseURL}/user/password`;
         const response = await this.http.put(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
             data,
         });
         let updatePasswordResponse: UpdatePasswordResponse;
@@ -70,6 +57,9 @@ export class UserinfoAPI extends BaseAPI {
         const url = `${this.baseURL}/user/profile/avatar`;
         const response = await this.http.put(url, {
             credentials: true,
+            headers: {
+                'content-type': 'no-set',
+            },
             data,
         });
         let responseObj: UserinfoResponse;

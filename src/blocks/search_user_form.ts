@@ -105,7 +105,6 @@ export default class SearchUserForm extends Block {
     private hilightRequest(el: HTMLElement) {
         const login = (el.parentElement?.querySelector('input[name=serach-users]') as HTMLInputElement).value;
         el.querySelectorAll('p.login').forEach((p) => {
-            // eslint-disable-next-line no-param-reassign
             p.innerHTML = p.innerHTML.replace(login, `<span>${login}</span>`);
         });
         ETB.trigger(AppEvent.USERS_SEARCH_Finished);

@@ -52,15 +52,6 @@ export abstract class Form {
         this.inputs?.forEach((i) => {
             i.validate();
         });
-        // const object: { [key: string]: FormDataEntryValue | null } = {};
-        // const formData = new FormData(this.form);
-        // // eslint-disable-next-line no-restricted-syntax
-        // for (const k of formData.keys()) {
-        //     object[k] = formData.get(k);
-        // }
-        // // eslint-disable-next-line no-console
-        // console.log(object);
-        // return object;
     }
 }
 
