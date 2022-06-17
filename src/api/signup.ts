@@ -28,16 +28,6 @@ export class SignupAPI extends BaseAPI {
         });
         const singupResponse: SignupResponse = JSON.parse(response.responseText);
         if (singupResponse.id) {
-            // const singinAPI = new SigninAPI();
-            // const signinResponse = await singinAPI.request({
-            //     login: data.login,
-            //     password: data.password,
-            // });
-            // if (signinResponse instanceof Object && signinResponse.reason) {
-            //     signinResponse.reason = `User with id#${singupResponse.id} was created, but:
-            //         ${signinResponse.reason} (trying to sign-in)`;
-            //     return signinResponse;
-            // }
             const userinfoAPI = new UserinfoAPI();
             const userinfoResponse = await userinfoAPI.request();
             if (userinfoResponse.reason) {

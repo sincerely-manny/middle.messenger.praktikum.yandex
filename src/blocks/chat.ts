@@ -169,7 +169,6 @@ export class Chat extends Block implements IChat {
             this.getChatUsers();
         }
         const usersInChat: Array<HTMLElement> = [];
-        // eslint-disable-next-line no-restricted-syntax
         for (const u of (await this.users)) {
             const li = (await TE.render('chat/user_in_chat', null, u))[0];
             li.querySelector('a.remove')?.addEventListener('click', (e) => {
@@ -274,7 +273,6 @@ export class Chat extends Block implements IChat {
         }
 
         const newMessages: Message[] = [];
-        // eslint-disable-next-line no-restricted-syntax
         for (const message of messages) {
             let newDate = false;
             if (currShownDate !== message.datePretty) {
@@ -460,7 +458,6 @@ export class Chat extends Block implements IChat {
     }
 
     private bindAddToChat(e: PointerEvent) {
-        // ETB.trigger(AppEvent.USERS_SEARCH_ToBeClosed);
         const { id } = (e.currentTarget as HTMLElement).dataset;
         if (id) {
             this.addUserToChat(+id);

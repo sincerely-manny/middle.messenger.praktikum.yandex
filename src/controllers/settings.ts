@@ -150,7 +150,6 @@ export default class Settings extends View {
             if (r === 'OK') {
                 NTF.notify('Password updated', InappNotificationStatus.INFO);
                 form?.inputs?.forEach((i) => {
-                    // eslint-disable-next-line no-param-reassign
                     i.html.value = '';
                 });
             } else {

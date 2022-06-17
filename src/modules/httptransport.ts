@@ -79,11 +79,6 @@ export default class HTTPTransport {
             }
 
             xhr.onload = () => {
-                // if (xhr.status === 200) {
-                //     resolve(xhr);
-                // } else {
-                //     reject(xhr);
-                // }
                 resolve(xhr);
             };
 

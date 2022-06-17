@@ -68,7 +68,6 @@ export class MessagesAPI extends BaseAPI {
             } else {
                 NTF.notify(`Connection broken: ${event.reason}`, InappNotificationStatus.ERROR);
             }
-            // console.log(`Код: ${event.code} | Причина: ${event.reason}`);
         });
 
         socket.addEventListener('message', (event) => {
@@ -78,7 +77,6 @@ export class MessagesAPI extends BaseAPI {
         socket.addEventListener('error', (event) => {
             this.connectionReject();
             NTF.notify(`Connection error: ${(event as ErrorEvent).message}`, InappNotificationStatus.ERROR);
-            // console.log('Ошибка', (event as ErrorEvent).message);
         });
         return this.socket;
     }

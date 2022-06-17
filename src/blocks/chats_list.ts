@@ -39,7 +39,6 @@ export default class ChatsList extends Block {
             }
         });
 
-        // ETB.subcribe(AppEvent.USERS_SEARCH_Placed, this.bindCreateChat);
         ETB.subcribe(AppEvent.CHATS_LIST_IS_Updated, this.update);
         ETB.subcribe(AppEvent.CHAT_ToBeDeleted, this.deleteChat);
 
@@ -63,8 +62,6 @@ export default class ChatsList extends Block {
         this._props.forEach(async (c: IChat, i: number, a: IChat[]) => {
             const chat = new Chat(c);
             this.chats?.push(chat);
-            // const html = await chat.renderChatListItem();
-            // TE.appendTo(document.getElementById('chats'), [html]);
             if (i === (a.length - 1)) {
                 ETB.trigger(AppEvent.CHATS_LIST_IS_Rendered_async, this.activeChat);
             }
@@ -88,16 +85,12 @@ export default class ChatsList extends Block {
             });
         } else if (fn === 'push') {
             chats?.forEach(async (chat) => {
-                // const html = await chat.renderChatListItem();
-                // TE.appendTo(document.getElementById('chats'), [html]);
                 chat.renderChatListItem().then((html) => {
                     document.getElementById('chats')?.append(html as Node);
                 });
             });
         } else if (fn === 'unshift') {
             chats?.forEach(async (chat) => {
-                // const html = await chat.renderChatListItem();
-                // TE.prependTo(document.getElementById('chats'), [html]);
                 chat.renderChatListItem().then((html) => {
                     document.getElementById('chats')?.prepend(html as Node);
                 });
@@ -139,7 +132,6 @@ export default class ChatsList extends Block {
         // почему поломался .find – пес его знает
         // const chat = this.chats?.find((e) => ((e.id === id) ? e : false));
         let chat: Chat | undefined;
-        // eslint-disable-next-line no-restricted-syntax
         for (const c of this.chats) {
             if (c.id === id) {
                 chat = c;
@@ -180,7 +172,6 @@ export default class ChatsList extends Block {
                 api.updateAvatar({ url: appData.user.avatar }, id).then((chatdata) => {
                     const chat = new Chat(chatdata);
                     this.chats.unshift(chat);
-                    // this.openChat(chat);
                     RTR.go(`messenger/${id}`);
                 });
             }

@@ -23,9 +23,6 @@ export class Router {
             return Router.instance;
         }
         this.routes = {};
-        // window.onpopstate = () => {
-        //     this.run(window.location.pathname);
-        // };
         window.addEventListener('popstate', () => {
             this.run(window.location.pathname);
         });
