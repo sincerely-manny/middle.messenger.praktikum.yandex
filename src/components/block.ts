@@ -20,6 +20,10 @@ export default abstract class Block {
         return this._isPlaced;
     }
 
+    get isRendered() {
+        return this._isRendered;
+    }
+
     protected render(id?: string): HTMLElement {
         if (this._element) {
             this._element.innerHTML = '';
@@ -33,10 +37,10 @@ export default abstract class Block {
     }
 
     public async place(parent: HTMLElement) {
+        if (this._isRendered instanceof Promise) {
+            await this._isRendered;
+        }
         if (!this._isPlaced) {
-            if (this._isRendered instanceof Promise) {
-                await this._isRendered;
-            }
             this.moveChildren(this._element, parent);
             this._element = parent;
             this._isPlaced = true;
@@ -50,14 +54,6 @@ export default abstract class Block {
         this._element = tempDiv;
         this._isPlaced = false;
         return tempDiv;
-    }
-
-    public show() {
-        this._element.style.display = '';
-    }
-
-    public hide() {
-        this._element.style.display = 'none';
     }
 
     protected childById(id: string, parent: HTMLElement = document.body): HTMLElement {

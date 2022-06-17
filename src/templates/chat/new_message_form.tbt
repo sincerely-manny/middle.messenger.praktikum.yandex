@@ -1,9 +1,8 @@
 <div class="new-message-form-container">
-    <form action="#" name="new_message" autocomplete="off">
+    <form action="/" name="new_message" autocomplete="off">
         <div class="input-container">
             <div class="message-text-input-container">
-                <input type="text" name="message" class="message-text" placeholder="Message" required pattern=".*\S.*" oninvalid="this.setCustomValidity(' ')"
-                oninput="this.setCustomValidity('')"> 
+                <input type="text" name="message" class="message-text" placeholder="Message"> 
                 <button name="submit" class="send-button">
                     <svg width="27" height="24" viewBox="0 0 27 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M0.5125 23.25L26.75 12L0.5125 0.75L0.5 9.5L19.25 12L0.5 14.5L0.5125 23.25Z" />

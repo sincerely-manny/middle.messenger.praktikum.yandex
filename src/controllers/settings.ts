@@ -7,7 +7,7 @@ import { AppEvent, ETB } from '../modules/eventbus';
 import { RTR } from '../modules/router';
 import Messenger from './messenger';
 import { UpdatePasswordData, UpdateUserData, UserinfoAPI } from '../api/userinfo';
-import { dummyAvatarBase64 } from '../utils/dummyavatar';
+import { replaceOnError } from '../utils/dummyavatar';
 
 export default class Settings extends View {
     private static instance:Settings;
@@ -50,7 +50,6 @@ export default class Settings extends View {
         this.profile?.unload();
         ETB.unsubscribe(AppEvent.CHATS_LIST_IS_Placed, this.init);
         ETB.unsubscribe(AppEvent.CHATS_LIST_HEADER_IS_Rendered, this.classActive);
-        // ETB.unsubscribe(AppEvent.PROFILE_IS_Rendered, this.bindEvents);
         ETB.unsubscribe(AppEvent.PROFILE_FORM_IS_Submitted, this.updateProfile);
         ETB.unsubscribe(AppEvent.PASSWORD_FORM_IS_Submitted, this.updatePassword);
         this.messenger?.stop();
@@ -82,11 +81,7 @@ export default class Settings extends View {
         this.profile?.element.querySelector('#avatar_input')?.addEventListener('change', () => {
             this.updateAvatar();
         });
-        this.profile?.element.querySelector('#avatar_preview')?.addEventListener('error', (e) => {
-            if (e.target) {
-                (e.target as HTMLImageElement).src = dummyAvatarBase64;
-            }
-        });
+        replaceOnError(this.profile?.element.querySelector('#avatar_preview'), appData.user.display_name_shown);
     }
 
     private logout() {

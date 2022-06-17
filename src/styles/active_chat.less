@@ -25,18 +25,42 @@
 
 .active-chat-container,
 #active-chat-container {
+    position: relative;
     .flex-display();
     .flex-direction(column);
     .justify-content(space-between);
+
+    width: 100%;
+
+    &.loading {
+        &::before {
+            display: block;
+            content: ' ';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            .image_as_bg('preloader.svg');
+
+            width: 200px;
+            height: 25px;
+            margin-left: -100px;
+            background-color: fade(@black, 50%);
+            border-radius: 25px;
+            outline: 10px solid fade(@black, 50%);
+        }
+    }
 
     .active-chat-messages-container {
         padding: 0 3em;
         box-sizing: border-box;
         overflow-y: scroll;
+        flex-basis: 100%;
     }
 }
 
 .date-separator {
+    .fadein-animation();
+
     display: block;
     border-top: 1px solid @green;
     border-bottom: 1px solid @green;
@@ -52,6 +76,8 @@
     margin-bottom: 2.2em;
 
     .sender {
+        .fadein-animation();
+
         margin: 1.5em 0 0.5em;
 
         *> {
@@ -73,6 +99,8 @@
     }
 
     .message-body {
+        .fadein-animation();
+
         position: relative;
 
         .text {
@@ -131,6 +159,8 @@
     }
 
     .message-img {
+        .fadein-animation();
+
         img {
             margin: 1em 0 0;
             height: 300px;
@@ -144,7 +174,7 @@
 }
 
 #active-chat-new-message {
-    padding: 0 3em;
+    padding: 0 3.5em 0 3em;
     position: relative;
     box-sizing: border-box;
 
@@ -157,6 +187,131 @@
         top: -1.5em;
         left: 0;
         background: linear-gradient(0deg, @grey 20%, (fade(@grey, 0%)) 100%);
+    }
+}
+
+#active-chat-header {
+    // background-color: fade(@black, 10%);
+    text-align: right;
+    box-sizing: border-box;
+    padding: 10px 3.5em 0 3em;
+    box-shadow: 0 10px 20px 1px @grey;
+    position: relative;
+    z-index: 1;
+
+    >a {
+        opacity: 0.5;
+        transition: opacity 0.3s, background-color 0.3s;
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        vertical-align: middle;
+        margin-left: 15px;
+        border: 10px solid transparent;
+        box-shadow: 0 0 0 1px @black;
+        border-radius: 30px;
+        box-sizing: content-box;
+
+        &:hover {
+            opacity: 1;
+            background-color: @green;
+        }
+
+        &.close {
+            .image_as_bg('cross.svg');
+
+            background-size: 80%;
+        }
+
+        &.delete {
+            .image_as_bg('trash-bin.svg');
+
+            background-size: 75%;
+        }
+
+        &.add {
+            .image_as_bg('add-user.svg');
+
+            background-size: 100%;
+            width: auto;
+            padding: 0 15px;
+            transition: width 0.5s;
+            overflow: hidden;
+
+            form {
+                left: -3px;
+                top: -100px;
+                display: block;
+                max-width: 0;
+                transform: scaleX(0);
+                transform-origin: 0 0;
+                transition: max-width 0.3s, opacity 0.5s, transform 0.3s;
+                opacity: 0;
+                white-space: nowrap;
+            }
+
+            &:focus,
+            &:hover {
+                background-color: transparent;
+                background-size: 0;
+                overflow: visible;
+
+                form {
+                    top: 0;
+                    display: inline-block;
+                    max-width: 250px;
+                    opacity: 1;
+                    transform: scaleX(1);
+                }
+            }
+        }
+    }
+
+    .users-in-chat {
+        float: left;
+        text-align: left;
+        font-weight: 300;
+
+        .users-in-chat-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            li {
+                display: inline;
+                line-height: 2em;
+                margin-right: 0.5em;
+
+                a.remove {
+                    display: inline-block;
+                    width: 0.6em;
+                    height: 0.6em;
+                    vertical-align: middle;
+                    margin-right: 0.5em;
+                    line-height: 0.5em;
+                    margin-top: -0.2em;
+                    border-radius: 1em;
+                    border: 3px solid transparent;
+                    box-shadow: 0 0 0 1px @black;
+
+                    .image_as_bg('remove.svg');
+
+                    background-position: 50% 52.2%;
+                    opacity: 0.5;
+                    transition: opacity 0.3s, background-color 0.3s;
+
+                    &:hover {
+                        opacity: 1;
+                        background-color: @green;
+                    }
+                }
+
+                &:not(:last-child)::after {
+                    content: ', ';
+                    display: inline;
+                }
+            }
+        }
     }
 }
 

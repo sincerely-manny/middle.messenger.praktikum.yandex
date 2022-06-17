@@ -20,7 +20,9 @@
             C310.307,390.519,306.948,387.161,302.806,387.161z"/>
     </svg>
 </a>
-<form action="#nochat" class="serach-chats" autocomplete="off">
-    <input type="text" name="serach-chats" placeholder="Search..." class="search-text">
+<div class="form-container"></div>
+<!-- <form action="/messenger" class="serach-users" autocomplete="off" tabindex="-1">
+    <input type="text" name="serach-users" placeholder="Search..." class="search-text">
     <input type="submit" value="Search" class="search-button">
-</form>
+    <div id="user-search-results-container"></div>
+</form> -->

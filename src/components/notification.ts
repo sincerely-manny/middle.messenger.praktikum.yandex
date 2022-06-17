@@ -42,6 +42,9 @@ export class InappNotification extends Block {
             notification.classList.remove('notification-fade');
             offTimeout = timeoutFn(notification, offTimeout);
         });
+        notification.addEventListener('click', () => {
+            this.notificationOnOff(notification, false);
+        });
     }
 
     public notificationOnOff(notifitation: HTMLElement, on = true) {

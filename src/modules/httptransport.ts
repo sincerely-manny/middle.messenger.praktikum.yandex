@@ -8,10 +8,11 @@ enum METHODS {
 
 type Options = {
     headers?: Record<string, string>,
-    data?: Record<string, string> | FormData,
+    data?: Record<string, string | Array<any> | number> | FormData,
     timeout?: number,
     method?: typeof METHODS[keyof typeof METHODS],
     credentials?: boolean,
+    responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text',
 };
 
 export default class HTTPTransport {
@@ -55,7 +56,7 @@ export default class HTTPTransport {
 
     request(url: string, options: Options, timeout = 5000): Promise<XMLHttpRequest> {
         let { method } = options;
-        const { credentials, data } = options;
+        const { credentials, data, responseType } = options;
 
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -66,6 +67,9 @@ export default class HTTPTransport {
             if (credentials) {
                 xhr.withCredentials = credentials;
             }
+            if (responseType) {
+                xhr.responseType = responseType;
+            }
             xhr.open(method, url);
             xhr.timeout = timeout;
             if (options.headers) {
@@ -75,6 +79,11 @@ export default class HTTPTransport {
             }
 
             xhr.onload = () => {
+                // if (xhr.status === 200) {
+                //     resolve(xhr);
+                // } else {
+                //     reject(xhr);
+                // }
                 resolve(xhr);
             };
 

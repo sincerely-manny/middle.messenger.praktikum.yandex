@@ -49,21 +49,18 @@ export abstract class Form {
     }
 
     public logObject() {
-        // да, уродливо, зато быстро
-        this.inputs?.forEach((i) => { // триггерим валидацию всех полей при сабмите
-            // i.html?.focus();
-            // i.html?.blur();
+        this.inputs?.forEach((i) => {
             i.validate();
         });
-        const object: { [key: string]: FormDataEntryValue | null } = {};
-        const formData = new FormData(this.form);
-        // eslint-disable-next-line no-restricted-syntax
-        for (const k of formData.keys()) {
-            object[k] = formData.get(k);
-        }
-        // eslint-disable-next-line no-console
-        console.log(object);
-        return object;
+        // const object: { [key: string]: FormDataEntryValue | null } = {};
+        // const formData = new FormData(this.form);
+        // // eslint-disable-next-line no-restricted-syntax
+        // for (const k of formData.keys()) {
+        //     object[k] = formData.get(k);
+        // }
+        // // eslint-disable-next-line no-console
+        // console.log(object);
+        // return object;
     }
 }
 

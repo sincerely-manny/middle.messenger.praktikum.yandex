@@ -1,15 +1,13 @@
-import { Chat } from '../blocks/chat';
+// import { Chat } from '../blocks/chat';
 import { AppEvent, ETB } from './eventbus';
 import { User } from './user';
 
-export class AppData {
+class AppData {
     private static instance: AppData;
 
     private _user?: User;
 
-    private _chats?: Chat[];
-
-    // private _runtime: Record<string, any> = {};
+    private _users: Record<number, User> = {};
 
     constructor() {
         if (AppData.instance) {
@@ -34,18 +32,22 @@ export class AppData {
         this._user = undefined;
     }
 
-    get chats() {
-        if (this._chats) {
-            return this._chats;
-        }
-        throw new Error('No chats were fetched');
+    get users() {
+        return this._users;
     }
 
-    set chats(data: Chat[]) {
-        this._chats = data;
+    public setUser(data: User | User[]) {
+        if (Array.isArray(data)) {
+            data.forEach((u) => {
+                this._users[u.id] = u;
+            });
+        } else {
+            this._users[data.id] = data;
+        }
+        return this._users;
     }
 }
 
 export const appData = new AppData();
 
-export default { AppData, appData };
+export default { appData };

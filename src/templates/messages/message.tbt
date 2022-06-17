@@ -1,5 +1,5 @@
 <section class="message-body">
-    <p class="text">{{$text}}</p>
-    <time class="timestamp">{{$time}}</time>
+    <p class="text">{{$content}}</p>
+    <time class="timestamp">{{$timePretty}}</time>
     <div class="unread status-{{$status}}"></div>
 </section>
