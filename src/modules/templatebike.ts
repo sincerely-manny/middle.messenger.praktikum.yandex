@@ -3,7 +3,15 @@
  * {{$arr}} {{$var}} {{/$arr}} => foreach
  */
 
-import * as importedTemplates from '../utils/importTemplates';
+import { importTemplatesFS } from '../utils/importTemplatesFS'; // только для тестов
+
+let importedTemplates: any;
+try {
+    // eslint-disable-next-line global-require
+    importedTemplates = require('../utils/importTemplates'); // на этом валится mocha, но жрет parcel
+} catch {
+    importedTemplates = importTemplatesFS;
+}
 
 const TEXT_NODE = 3;
 const ELEMENT_NODE = 1;

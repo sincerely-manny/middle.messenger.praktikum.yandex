@@ -23,9 +23,12 @@ export class Router {
             return Router.instance;
         }
         this.routes = {};
-        window.onpopstate = () => {
+        // window.onpopstate = () => {
+        //     this.run(window.location.pathname);
+        // };
+        window.addEventListener('popstate', () => {
             this.run(window.location.pathname);
-        };
+        });
         this._root = this.getParams(window.location.pathname).root;
         Router.instance = this;
     }
@@ -35,7 +38,7 @@ export class Router {
     }
 
     public go(path: keyof typeof this.routes) {
-        window.history.pushState({}, '', `/${path}`);
+        window.history.pushState({ path }, '', `/${path}`);
         const popStateEvent = new PopStateEvent('popstate', {});
         dispatchEvent(popStateEvent);
     }

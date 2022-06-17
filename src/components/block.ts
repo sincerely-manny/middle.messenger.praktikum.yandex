@@ -20,6 +20,10 @@ export default abstract class Block {
         return this._isPlaced;
     }
 
+    get isRendered() {
+        return this._isRendered;
+    }
+
     protected render(id?: string): HTMLElement {
         if (this._element) {
             this._element.innerHTML = '';
