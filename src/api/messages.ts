@@ -30,12 +30,7 @@ export class MessagesAPI extends BaseAPI {
 
     public async connect(id: number, user: User): Promise<ConnectResponse> {
         const url = `${this.baseURL}/chats/token/${id}`;
-        const response = await this.http.post(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-        });
+        const response = await this.http.post(url);
         const connectResponse: ConnectResponse = JSON.parse(response.responseText);
         this.getSocket(user.id, id, connectResponse.token);
         return connectResponse;

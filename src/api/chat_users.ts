@@ -21,13 +21,7 @@ type RemoveUserResponse = 'OK' | {
 export class ChatUsersAPI extends BaseAPI {
     public async update(data: AddToChatData): Promise<AddToChatResponse> {
         const url = `${this.baseURL}/chats/users`;
-        const response = await this.http.put(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.put(url, { data });
 
         let addToChatResponse: AddToChatResponse;
         try {
@@ -40,13 +34,7 @@ export class ChatUsersAPI extends BaseAPI {
 
     public async delete(data: RemoveUserData): Promise<RemoveUserResponse> {
         const url = `${this.baseURL}/chats/users`;
-        const response = await this.http.delete(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.delete(url, { data });
         let removeUserResponse: RemoveUserResponse;
         try {
             removeUserResponse = JSON.parse(response.responseText);

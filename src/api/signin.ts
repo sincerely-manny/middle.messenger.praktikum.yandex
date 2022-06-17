@@ -14,13 +14,7 @@ export type SigninResponse = 'OK' | {
 export class SigninAPI extends BaseAPI {
     public async request(data: SigninData): Promise<SigninResponse> {
         const url = `${this.baseURL}/auth/signin`;
-        const response = await this.http.post(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.post(url, { data });
         let signinResponse: SigninResponse;
         try {
             signinResponse = JSON.parse(response.responseText);

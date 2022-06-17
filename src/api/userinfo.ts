@@ -19,12 +19,7 @@ export type UpdatePasswordResponse = 'OK' | {
 export class UserinfoAPI extends BaseAPI {
     public async request(): Promise<UserinfoResponse> {
         const url = `${this.baseURL}/auth/user`;
-        const response = await this.http.get(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-        });
+        const response = await this.http.get(url);
         const responseObj: UserinfoResponse = JSON.parse(response.responseText);
         if (!responseObj.reason) {
             return new User(responseObj);
@@ -34,13 +29,7 @@ export class UserinfoAPI extends BaseAPI {
 
     public async update(data: UpdateUserData): Promise<UserinfoResponse> {
         const url = `${this.baseURL}/user/profile`;
-        const response = await this.http.put(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.put(url, { data });
         const updateResponse: UserinfoResponse = JSON.parse(response.responseText);
         if (!updateResponse.reason) {
             return new User(updateResponse);
@@ -50,13 +39,7 @@ export class UserinfoAPI extends BaseAPI {
 
     public async updatePassword(data: UpdatePasswordData): Promise<UpdatePasswordResponse> {
         const url = `${this.baseURL}/user/password`;
-        const response = await this.http.put(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.put(url, { data });
         let updatePasswordResponse: UpdatePasswordResponse;
         try {
             updatePasswordResponse = JSON.parse(response.responseText);

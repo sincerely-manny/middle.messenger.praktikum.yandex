@@ -32,25 +32,14 @@ type DeleteChatResponse = {
 export class ChatsAPI extends BaseAPI {
     public async request(): Promise<IChat[]> {
         const url = `${this.baseURL}/chats`;
-        const response = await this.http.get(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-        });
+        const response = await this.http.get(url);
         const chatslistResponse: IChat[] = JSON.parse(response.responseText);
         return chatslistResponse;
     }
 
     public async create(data: CreateChatData): Promise<CreateChatResponse> {
         const url = `${this.baseURL}/chats`;
-        const response = await this.http.post(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.post(url, { data });
         const createChatResponse = JSON.parse(response.responseText);
         return createChatResponse;
     }
@@ -91,13 +80,7 @@ export class ChatsAPI extends BaseAPI {
 
     public async delete(data: DeleteChatData): Promise<DeleteChatResponse> {
         const url = `${this.baseURL}/chats`;
-        const response = await this.http.delete(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-            data,
-        });
+        const response = await this.http.delete(url, { data });
         const deleteChatResponse = JSON.parse(response.responseText);
         return deleteChatResponse;
     }

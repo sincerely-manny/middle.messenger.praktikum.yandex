@@ -15,8 +15,15 @@ type Options = {
     responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text',
 };
 
+const defaultOptions: Options = {
+    credentials: true,
+    headers: {
+        'content-type': 'application/json',
+    },
+};
+
 export default class HTTPTransport {
-    get(url: string, options: Options) {
+    get(url: string, options: Options = defaultOptions) {
         let queryString: string = '';
         if (options.data) {
             queryString = Object.entries(options.data)
@@ -30,7 +37,7 @@ export default class HTTPTransport {
         );
     }
 
-    put(url: string, options: Options) {
+    put(url: string, options: Options = defaultOptions) {
         return this.request(
             url,
             { ...options, method: METHODS.PUT },
@@ -38,7 +45,7 @@ export default class HTTPTransport {
         );
     }
 
-    post(url: string, options: Options) {
+    post(url: string, options: Options = defaultOptions) {
         return this.request(
             url,
             { ...options, method: METHODS.POST },
@@ -46,7 +53,7 @@ export default class HTTPTransport {
         );
     }
 
-    delete(url: string, options: Options) {
+    delete(url: string, options: Options = defaultOptions) {
         return this.request(
             url,
             { ...options, method: METHODS.DELETE },
@@ -54,7 +61,11 @@ export default class HTTPTransport {
         );
     }
 
-    request(url: string, options: Options, timeout = 5000): Promise<XMLHttpRequest> {
+    request(
+        url: string,
+        options: Options,
+        timeout = 5000,
+    ): Promise<XMLHttpRequest> {
         let { method } = options;
         const { credentials, data, responseType } = options;
 
@@ -64,19 +75,23 @@ export default class HTTPTransport {
             if (!method) {
                 method = METHODS.GET;
             }
-            if (credentials) {
-                xhr.withCredentials = credentials;
+            if (credentials || credentials === undefined) {
+                xhr.withCredentials = true;
             }
             if (responseType) {
                 xhr.responseType = responseType;
             }
             xhr.open(method, url);
             xhr.timeout = timeout;
-            if (options.headers) {
-                Object.entries(options.headers).forEach((h) => {
-                    xhr.setRequestHeader(h[0], h[1]);
-                });
+            if (!options.headers) {
+                options.headers = {};
             }
+            if (!options.headers['content-type']) {
+                options.headers['content-type'] = 'application/json';
+            }
+            Object.entries(options.headers).forEach((h) => {
+                xhr.setRequestHeader(h[0], h[1]);
+            });
 
             xhr.onload = () => {
                 resolve(xhr);

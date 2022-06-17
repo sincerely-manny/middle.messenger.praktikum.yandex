@@ -7,12 +7,7 @@ export type LogoutResponse = 'OK' | {
 export class LoguotAPI extends BaseAPI {
     public async request(): Promise<LogoutResponse> {
         const url = `${this.baseURL}/auth/logout`;
-        const response = await this.http.post(url, {
-            credentials: true,
-            headers: {
-                'content-type': 'application/json',
-            },
-        });
+        const response = await this.http.post(url);
         let logoutResponse: LogoutResponse;
         try {
             logoutResponse = JSON.parse(response.responseText);
