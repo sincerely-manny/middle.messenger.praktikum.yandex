@@ -1,7 +1,0 @@
-{
-  "extends": "@parcel/config-default",
-  "transformers": {
-    "*.tbt": ["@sincerely-manny/parcel-transformer-tbt"]
-  }, 
-  "resolvers": ["@parcel/resolver-glob", "..."]
-}

@@ -9,8 +9,12 @@
   "repository": "github:sincerely-manny/middle.messenger.praktikum.yandex",
   "main": "src/script.ts",
   "scripts": {
-    "lint": "echo \"ESLINT: \" && npx eslint . && echo \"/ESLINT;\nSTYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\"",
-    "test": "./node_modules/.bin/mocha",
+    "test:lint": "echo \"ESLINT: \" && npx eslint . && echo \"/ESLINT;\"",
+    "test:style": "echo \"STYLELINT: \" && npx stylelint src/styles/*.less && echo \"/STYLELINT\"",
+    "test:tsc": "echo \"TSC: \" && npx tsc --noEmit && echo \"/TSC;\"",
+    "test:unit": "./node_modules/.bin/mocha",
+    "test": "npm-run-all test:*",
+    "clean": "rm -r dist/*",
     "serve": "webpack serve --mode=development --progress --open-app-name 'Google Chrome' ",
     "build": "webpack",
     "build:prod": "webpack --config webpack.config.prod.cjs",
@@ -38,6 +42,7 @@
     "eslint-config-airbnb-typescript": "17.0.0",
     "html-loader": "3.1.2",
     "html-webpack-plugin": "5.5.0",
+    "husky": "8.0.1",
     "jsdom": "19.0.0",
     "jsdom-global": "3.0.2",
     "less": "4.1.3",
@@ -45,6 +50,7 @@
     "mini-css-extract-plugin": "2.6.1",
     "mocha": "10.0.0",
     "mocha-jsdom": "2.0.0",
+    "npm-run-all": "4.1.5",
     "path-browserify": "1.0.1",
     "postcss-less": "6.0.0",
     "process": "0.11.10",
@@ -138,6 +144,11 @@
           ]
         }
       ]
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test"
     }
   }
 }

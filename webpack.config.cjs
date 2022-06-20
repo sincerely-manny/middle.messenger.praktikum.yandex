@@ -11,7 +11,7 @@ module.exports = {
   entry: './src/script.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: '[hash].js',
+    filename: '[fullhash].js',
     publicPath: '/',
   },
   resolve: {
@@ -95,7 +95,7 @@ module.exports = {
       },
     }),
     new MiniCssExtractPlugin({
-      filename: 'style-[hash].css',
+      filename: 'style-[fullhash].css',
     }),
   ],
 }; 
