@@ -6,9 +6,10 @@
 import { importTemplatesFS } from '../utils/importTemplatesFS'; // только для тестов
 
 let importedTemplates: any;
-try {
+try { // на этом валится mocha, но жрет webpack
     // eslint-disable-next-line global-require
-    importedTemplates = require('../utils/importTemplates'); // на этом валится mocha, но жрет parcel
+    importedTemplates = require('../utils/importTemplatesWP').default.importTemplatesWP;
+    // importedTemplates = require('../utils/importTemplates');
 } catch {
     importedTemplates = importTemplatesFS;
 }
@@ -187,13 +188,15 @@ export class TemplateBike {
     }
 
     private async fetchTemplate(templateName: string) {
-        const templatePath = templateName.split('/');
-        let template: any = await this.templates;
-        for (let i = 0; i < templatePath.length; i++) {
-            template = await template[templatePath[i]];
-        }
-        template = await template();
-        return template.default;
+        // console.log(this.templates(templateName));
+        // const templatePath = templateName.split('/');
+        // let template: any = await this.templates;
+        // for (let i = 0; i < templatePath.length; i++) {
+        //     template = await template[templatePath[i]];
+        // }
+        // template = await template();
+        // return template.default;
+        return this.templates(templateName);
     }
 
     public async render(
