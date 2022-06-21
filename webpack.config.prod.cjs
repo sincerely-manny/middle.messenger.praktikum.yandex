@@ -6,20 +6,25 @@ const common = require('./webpack.config.cjs');
 
 module.exports = merge(common, {
   mode: 'production',
-  module: {
-    rules: [
-        {
-            test: /\.tsx?$/,
-            use: [
-                {
-                loader: 'ts-loader',
-                options: {
-                    configFile: path.resolve(__dirname, 'tsconfig.json'),
-                },
-                },
-            ],
-            exclude: /(node_modules)/
-        },
-    ],
-  }
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist'),
+      watch: false,
+      serveIndex: false,
+    },
+    compress: true,
+    port: process.env.PORT,
+    historyApiFallback: true,
+    allowedHosts: ['practicum-messenger-sm.herokuapp.com'],
+    client: {
+      logging: 'none',
+      overlay: false,
+      progress: false,
+    },
+    liveReload: false,
+    hot: false,
+    magicHtml: false,
+    port: process.env.PORT || 8080,
+
+  },
 });
