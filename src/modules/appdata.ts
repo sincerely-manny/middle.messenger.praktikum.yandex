@@ -1,4 +1,3 @@
-// import { Chat } from '../blocks/chat';
 import { AppEvent, ETB } from './eventbus';
 import { User } from './user';
 
