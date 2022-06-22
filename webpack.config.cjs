@@ -3,7 +3,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 
 module.exports = {
@@ -52,22 +51,6 @@ module.exports = {
         ],
       },
     ]
-  },
-  optimization: {
-    minimizer: [
-      new CssMinimizerPlugin({
-        parallel: true,
-        minimizerOptions: {
-          preset: [
-            "default",
-            {
-              discardComments: { removeAll: true },
-            },
-          ],
-        },
-      }),
-    ],
-    minimize: true,
   },
   plugins: [
     new CleanWebpackPlugin({

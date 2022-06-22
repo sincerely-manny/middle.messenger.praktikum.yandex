@@ -20,7 +20,11 @@
     "build": "webpack",
     "build:prod": "webpack --config webpack.config.prod.cjs",
     "start-dev": "npm run serve",
-    "start": "webpack serve --config webpack.config.prod.cjs "
+    "start": "webpack serve --config webpack.config.prod.cjs",
+    "docker:build": "docker build -t practicum_messenger .",
+    "docker:run": "docker run -p 8080:8080 -it practicum_messenger",
+    "heroku:push": "heroku container:push web",
+    "heroku:release": "heroku container:release web && heroku open"
   },
   "browser": {
     "fs": false,
@@ -60,6 +64,7 @@
     "stylelint": "14.9.1",
     "stylelint-config-standard": "26.0.0",
     "stylelint-less": "1.0.6",
+    "terser-webpack-plugin": "5.3.3",
     "ts-loader": "9.3.0",
     "ts-mocha": "10.0.0",
     "ts-node": "10.8.1",
