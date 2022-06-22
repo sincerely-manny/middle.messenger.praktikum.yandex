@@ -1,4 +1,4 @@
-## Ссылка на PR: https://github.com/sincerely-manny/middle.messenger.praktikum.yandex/pull/14
+## Ссылка на PR: https://github.com/sincerely-manny/middle.messenger.praktikum.yandex/pull/16
 
 # Проект I модуля практикума
 =======
