@@ -97,10 +97,7 @@ export class Chat extends Block implements IChat {
 
     public set unixTimestamp(t: number) {
         this._unixTimestamp = t;
-        const el = this.listHtmlElement;
-        if (el) {
-            el.setAttribute('style', `--data-timestamp:${t};`);
-        }
+        this.listHtmlElement?.setAttribute('style', `--data-timestamp:${t};`);
     }
 
     public get active() {
@@ -236,6 +233,7 @@ export class Chat extends Block implements IChat {
         if (this.active) {
             this.listHtmlElement.classList.add('active');
         }
+        this.listHtmlElement?.setAttribute('style', `--data-timestamp:${this.unixTimestamp};`);
         return this.listHtmlElement;
     }
 

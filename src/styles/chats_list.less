@@ -175,7 +175,7 @@
             }
         }
 
-        &[data-unread]:not([data-unread='']):not([data-unread='0']) {
+        &[data-unread]:not([data-unread=''], [data-unread='0']) {
             .last-message-preview {
                 font-weight: 400;
                 color: fade(@grey, 90%);
